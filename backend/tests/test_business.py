@@ -139,6 +139,7 @@ def test_product_soft_delete_keeps_order_snapshot(client: TestClient):
         },
     ).json()
     assert client.delete(f"/api/products/{product_id}", headers=headers).status_code == 200
+    assert client.delete(f"/api/products/{product_id}", headers=headers).status_code == 200
     products = client.get("/api/products", headers=headers).json()
     assert products == []
     detail = client.get(f"/api/orders/{order['id']}/detail", headers=headers).json()

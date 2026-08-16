@@ -52,8 +52,10 @@ def update_product(
 @router.delete("/{product_id}")
 def delete_product(product_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)) -> dict[str, str]:
     product = db.scalar(select(Product).where(Product.id == product_id, Product.user_id == user.id))
-    if product is None or product.status == "deleted":
+    if product is None:
         raise HTTPException(status_code=404, detail="商品不存在")
+    if product.status == "deleted":
+        return {"message": "删除成功"}
     product.status = "deleted"
     db.commit()
     return {"message": "删除成功"}

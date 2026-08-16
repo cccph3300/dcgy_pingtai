@@ -42,7 +42,9 @@
       </div>
       <div class="product-actions">
         <button class="ghost-button" type="button" @click="startEdit(product)">编辑</button>
-        <button class="danger-button" type="button" @click="remove(product)">删除</button>
+        <button class="danger-button" type="button" :disabled="deletingProductId === product.id" @click="remove(product)">
+          {{ deletingProductId === product.id ? '删除中' : '删除' }}
+        </button>
       </div>
     </section>
     <section v-if="totalPages > 1 && !editing" class="pagination card">
@@ -57,6 +59,7 @@
 import { Plus } from 'lucide-vue-next'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 
+import { ApiError } from '@/api/client'
 import { createProduct, deleteProduct, updateProduct } from '@/api/products'
 import AppShell from '@/components/AppShell.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -69,6 +72,7 @@ const productStore = useProductStore()
 const keyword = ref('')
 const page = ref(1)
 const pageSize = 3
+const deletingProductId = ref<number | null>(null)
 const editing = ref<{ id?: number; name: string; net_weight: string; gross_weight: string; cost: string } | null>(null)
 const enabledMarkets = ref<Supermarket[]>([])
 const marketForm = reactive<Record<Supermarket, ProductMarket>>({
@@ -131,8 +135,16 @@ async function save() {
 
 async function remove(product: Product) {
   if (!window.confirm(`确定删除「${product.name}」吗？`)) return
-  await deleteProduct(product.id)
-  await productStore.fetchProducts()
+  deletingProductId.value = product.id
+  try {
+    await deleteProduct(product.id)
+    await productStore.fetchProducts()
+  } catch (error) {
+    const message = error instanceof ApiError ? error.message : '删除失败，请稍后重试'
+    window.alert(message)
+  } finally {
+    deletingProductId.value = null
+  }
 }
 </script>
 
