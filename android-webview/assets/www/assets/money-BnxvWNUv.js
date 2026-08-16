@@ -1,0 +1,1 @@
+function n(r){const t=Number(r??0);return Number.isFinite(t)?t:0}function e(r){return n(r).toFixed(2)}function u(r){return`¥${e(r)}`}function i(r){return!r||r.length<7?r:`${r.slice(0,3)}****${r.slice(-4)}`}export{i as a,u as c,e as m,n as t};
