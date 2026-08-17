@@ -47,6 +47,30 @@ def recalculate_order_totals(order: Order) -> None:
     order.total_profit = apply_adjustments(product_profit, order.adjustments)
 
 
+def calculate_order_commission(order: Order) -> Decimal:
+    total = sum(
+        (item.commission_price * item.quantity for vehicle in order.vehicles for item in vehicle.items),
+        Decimal("0.00"),
+    )
+    return money(total)
+
+
+def order_out(order: Order) -> dict:
+    return {
+        "id": order.id,
+        "order_date": order.order_date,
+        "supermarket": order.supermarket,
+        "total_amount": money(order.total_amount),
+        "total_profit": money(order.total_profit),
+        "total_commission": calculate_order_commission(order),
+        "status": order.status,
+    }
+
+
+def order_detail_out(order: Order) -> dict:
+    return {**order_out(order), "vehicles": order.vehicles, "adjustments": order.adjustments}
+
+
 def upsert_product(db: Session, user: User, payload: ProductIn, product: Product | None = None) -> Product:
     if product is None:
         existing = db.scalar(
@@ -179,13 +203,14 @@ def summarize_days(orders: list[Order]) -> list[dict]:
     result = []
     for day in sorted(grouped.keys(), reverse=True):
         day_orders = grouped[day]
+        order_summaries = [order_out(order) for order in day_orders]
         result.append(
             {
                 "date": day,
-                "orders": day_orders,
+                "orders": order_summaries,
                 "total_amount": money(sum((item.total_amount for item in day_orders), Decimal("0.00"))),
                 "total_profit": money(sum((item.total_profit for item in day_orders), Decimal("0.00"))),
-                "total_commission": money(sum((item.total_commission for item in day_orders), Decimal("0.00"))),
+                "total_commission": money(sum((item["total_commission"] for item in order_summaries), Decimal("0.00"))),
             }
         )
     return result

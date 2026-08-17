@@ -103,6 +103,16 @@ def test_order_profit_and_vehicle_children(client: TestClient):
     assert len(data["vehicles"][0]["items"]) == 3
     assert data["vehicles"][0]["vehicle_no"] == "粤A12345"
 
+    days = client.get("/api/orders", headers=headers).json()
+    assert days[0]["total_commission"] == "32.50"
+    assert days[0]["orders"][0]["total_commission"] == "32.50"
+
+    detail = client.get("/api/orders/2026-08-16", headers=headers).json()
+    assert detail[0]["total_commission"] == "32.50"
+
+    stats = client.get("/api/statistics", headers=headers).json()
+    assert stats["total_commission"] == "32.50"
+
 
 def test_adjustments_change_amount_and_profit(client: TestClient):
     headers = auth_headers(client)

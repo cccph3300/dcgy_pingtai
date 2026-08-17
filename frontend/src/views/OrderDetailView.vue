@@ -35,7 +35,7 @@
         </span>
         <span>
           <small>总抽佣</small>
-          <b>{{ currency(order.total_commission) }}</b>
+          <b>{{ currency(orderCommission(order)) }}</b>
         </span>
       </button>
     </div>
@@ -463,10 +463,17 @@ function productTotals(order: OrderDetail) {
   }
 }
 
+function orderCommission(order: OrderDetail) {
+  return order.vehicles.reduce(
+    (sum, vehicle) => sum + vehicle.items.reduce((itemSum, item) => itemSum + toNumber(item.commission_price) * toNumber(item.quantity), 0),
+    0,
+  )
+}
+
 const grandTotal = computed(() => ({
   amount: orders.value.reduce((sum, order) => sum + toNumber(order.total_amount), 0),
   profit: orders.value.reduce((sum, order) => sum + toNumber(order.total_profit), 0),
-  commission: orders.value.reduce((sum, order) => sum + toNumber(order.total_commission), 0),
+  commission: orders.value.reduce((sum, order) => sum + orderCommission(order), 0),
 }))
 
 async function saveAdjustments(order: OrderDetail) {
@@ -721,17 +728,33 @@ function selectedMarketHasLoaded() {
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 12px;
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
 }
 
 .market-tab.active {
+  background: linear-gradient(180deg, rgba(0, 113, 227, 0.16), rgba(0, 113, 227, 0.06));
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.12);
+  border-width: 2px;
+  box-shadow: 0 8px 22px rgba(0, 113, 227, 0.18);
+}
+
+.market-tab:not(.active) {
+  opacity: 0.72;
 }
 
 .market-tab strong {
   color: var(--accent);
   font-size: 15px;
   text-align: center;
+}
+
+.market-tab.active strong {
+  justify-self: center;
+  min-width: 78px;
+  padding: 4px 12px;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 999px;
 }
 
 .market-tab span {

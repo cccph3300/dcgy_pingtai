@@ -8,7 +8,7 @@ from app.database import get_db
 from app.deps import get_current_user
 from app.models import Order, OrderVehicle, User
 from app.schemas import DayOrderSummary, OrderAdjustmentsUpdateIn, OrderDetailOut, OrderOut, OrderSaveIn
-from app.services import save_order, summarize_days, update_adjustments
+from app.services import order_detail_out, save_order, summarize_days, update_adjustments
 
 
 router = APIRouter(prefix="/orders", tags=["订单"])
@@ -40,8 +40,8 @@ def list_orders(
 
 
 @router.get("/{order_date}", response_model=list[OrderDetailOut])
-def get_orders_by_date(order_date: date, db: Session = Depends(get_db), user: User = Depends(get_current_user)) -> list[Order]:
-    return list(
+def get_orders_by_date(order_date: date, db: Session = Depends(get_db), user: User = Depends(get_current_user)) -> list[dict]:
+    orders = list(
         db.scalars(
             select(Order)
             .options(joinedload(Order.vehicles).joinedload(OrderVehicle.items), joinedload(Order.adjustments))
@@ -51,22 +51,28 @@ def get_orders_by_date(order_date: date, db: Session = Depends(get_db), user: Us
         .unique()
         .all()
     )
+    return [order_detail_out(order) for order in orders]
 
 
 @router.post("", response_model=OrderDetailOut)
 def create_or_replace_order(
     payload: OrderSaveIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)
-) -> Order:
+) -> dict:
     order = save_order(db, user, payload)
     db.commit()
     db.refresh(order)
-    return order
+    order = db.execute(
+        select(Order)
+        .options(joinedload(Order.vehicles).joinedload(OrderVehicle.items), joinedload(Order.adjustments))
+        .where(Order.id == order.id)
+    ).unique().scalar_one()
+    return order_detail_out(order)
 
 
 @router.put("/{order_id}", response_model=OrderDetailOut)
 def replace_order(
     order_id: int, payload: OrderSaveIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)
-) -> Order:
+) -> dict:
     existing = db.scalar(select(Order).where(Order.id == order_id, Order.user_id == user.id))
     if existing is None:
         raise HTTPException(status_code=404, detail="订单不存在")
@@ -75,11 +81,16 @@ def replace_order(
     order = save_order(db, user, payload)
     db.commit()
     db.refresh(order)
-    return order
+    order = db.execute(
+        select(Order)
+        .options(joinedload(Order.vehicles).joinedload(OrderVehicle.items), joinedload(Order.adjustments))
+        .where(Order.id == order.id)
+    ).unique().scalar_one()
+    return order_detail_out(order)
 
 
 @router.get("/{order_id}/detail", response_model=OrderDetailOut)
-def get_order_detail(order_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)) -> Order:
+def get_order_detail(order_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)) -> dict:
     order = db.execute(
         select(Order)
         .options(joinedload(Order.vehicles).joinedload(OrderVehicle.items), joinedload(Order.adjustments))
@@ -87,7 +98,7 @@ def get_order_detail(order_id: int, db: Session = Depends(get_db), user: User = 
     ).unique().scalar_one_or_none()
     if order is None:
         raise HTTPException(status_code=404, detail="订单不存在")
-    return order
+    return order_detail_out(order)
 
 
 @router.put("/{order_id}/adjustments", response_model=OrderDetailOut)
@@ -96,8 +107,13 @@ def update_order_adjustments(
     payload: OrderAdjustmentsUpdateIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
-) -> Order:
+) -> dict:
     order = update_adjustments(db, user, order_id, payload.adjustments)
     db.commit()
     db.refresh(order)
-    return order
+    order = db.execute(
+        select(Order)
+        .options(joinedload(Order.vehicles).joinedload(OrderVehicle.items), joinedload(Order.adjustments))
+        .where(Order.id == order.id)
+    ).unique().scalar_one()
+    return order_detail_out(order)
