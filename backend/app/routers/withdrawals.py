@@ -23,7 +23,7 @@ def list_withdrawals(db: Session = Depends(get_db), user: User = Depends(get_cur
 def create_withdrawal(
     payload: WithdrawalIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)
 ) -> Withdrawal:
-    _, _, _, available_amount = statistics_query(db, user)
+    _, _, _, _, available_amount = statistics_query(db, user)
     amount = money(payload.amount)
     if amount <= 0:
         raise HTTPException(status_code=400, detail="提现金额必须大于 0")

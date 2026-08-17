@@ -143,6 +143,7 @@ class OrderOut(ApiModel):
     supermarket: str
     total_amount: Decimal
     total_profit: Decimal
+    total_commission: Decimal
     status: str
 
 
@@ -156,11 +157,13 @@ class DayOrderSummary(ApiModel):
     orders: list[OrderOut]
     total_amount: Decimal
     total_profit: Decimal
+    total_commission: Decimal
 
 
 class StatisticsOut(ApiModel):
     total_amount: Decimal
     total_profit: Decimal
+    total_commission: Decimal = Decimal("0.00")
     withdrawn_amount: Decimal = Decimal("0.00")
     available_withdrawal_amount: Decimal = Decimal("0.00")
 

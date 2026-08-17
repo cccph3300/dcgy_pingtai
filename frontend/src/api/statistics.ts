@@ -7,6 +7,7 @@ export function getStatistics(startDate?: string, endDate?: string) {
   return request<{
     total_amount: string
     total_profit: string
+    total_commission: string
     withdrawn_amount: string
     available_withdrawal_amount: string
   }>(`/statistics${params.toString() ? `?${params}` : ''}`)

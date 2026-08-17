@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    app_name: str = "东成果业入账订单管理系统"
+    app_name: str = "超市配送"
     environment: str = "development"
     api_prefix: str = "/api"
     database_url: str = "sqlite:///./dev.db"
@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     default_admin_username: str = "admin"
     default_admin_password: str = "admin123456"
     default_admin_phone: str = "18000002319"
-    default_admin_nickname: str = "东成果业"
+    default_admin_nickname: str = "超市配送"
     cors_origins: str = "*"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")

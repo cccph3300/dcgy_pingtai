@@ -74,6 +74,7 @@ export interface OrderDetail {
   supermarket: Supermarket
   total_amount: string
   total_profit: string
+  total_commission: string
   status: string
   vehicles: OrderVehicle[]
   adjustments: Adjustment[]
@@ -84,6 +85,7 @@ export interface DaySummary {
   orders: OrderDetail[]
   total_amount: string
   total_profit: string
+  total_commission: string
 }
 
 export interface Withdrawal {

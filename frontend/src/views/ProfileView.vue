@@ -4,15 +4,27 @@
       <div class="avatar">
         <UserRound :size="56" />
       </div>
-      <h1>{{ userStore.user?.nickname || '东成果业' }}</h1>
+      <h1>超市配送</h1>
       <p>{{ maskPhone(userStore.user?.phone || '') }}</p>
     </section>
 
     <section class="profile-stats">
       <span>总计金额</span>
       <strong>{{ currency(total.total_amount) }}</strong>
-      <span>今日金额</span>
-      <b>{{ currency(today.total_amount) }}</b>
+      <div class="today-grid">
+        <div>
+          <span>今日金额</span>
+          <b>{{ currency(today.total_amount) }}</b>
+        </div>
+        <div>
+          <span>今日利润</span>
+          <b class="money-red">{{ currency(today.total_profit) }}</b>
+        </div>
+        <div>
+          <span>今日抽佣</span>
+          <b>{{ currency(today.total_commission) }}</b>
+        </div>
+      </div>
       <div class="withdraw-grid">
         <div>
           <span>已提现金额</span>
@@ -23,8 +35,16 @@
           <b>{{ currency(total.available_withdrawal_amount) }}</b>
         </div>
       </div>
-      <span>总利润</span>
-      <strong class="money-red">{{ currency(total.total_profit) }}</strong>
+      <div class="profit-grid">
+        <div>
+          <span>总利润</span>
+          <strong class="money-red">{{ currency(total.total_profit) }}</strong>
+        </div>
+        <div>
+          <span>总计抽佣</span>
+          <strong>{{ currency(total.total_commission) }}</strong>
+        </div>
+      </div>
     </section>
 
     <section class="menu-card card">
@@ -45,8 +65,20 @@ import { todayISO } from '@/utils/date'
 import { currency, maskPhone } from '@/utils/money'
 
 const userStore = useUserStore()
-const total = ref({ total_amount: '0.00', total_profit: '0.00', withdrawn_amount: '0.00', available_withdrawal_amount: '0.00' })
-const today = ref({ total_amount: '0.00', total_profit: '0.00', withdrawn_amount: '0.00', available_withdrawal_amount: '0.00' })
+const total = ref({
+  total_amount: '0.00',
+  total_profit: '0.00',
+  total_commission: '0.00',
+  withdrawn_amount: '0.00',
+  available_withdrawal_amount: '0.00',
+})
+const today = ref({
+  total_amount: '0.00',
+  total_profit: '0.00',
+  total_commission: '0.00',
+  withdrawn_amount: '0.00',
+  available_withdrawal_amount: '0.00',
+})
 
 onMounted(async () => {
   await userStore.fetchMe()
@@ -105,20 +137,46 @@ p {
   font-weight: 500;
 }
 
+.today-grid,
 .withdraw-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 8px;
   padding: 0 12px;
 }
 
-.withdraw-grid div {
+.today-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.withdraw-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+.today-grid div,
+.withdraw-grid div,
+.profit-grid div {
   display: grid;
   gap: 6px;
   padding: 12px 8px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 16px;
+}
+
+.today-grid b {
+  font-size: 18px;
+}
+
+.profit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 12px;
+}
+
+.profit-grid strong {
+  font-size: 22px;
+  font-weight: 500;
 }
 
 .menu-card {

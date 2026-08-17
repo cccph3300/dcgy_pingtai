@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { getOrdersByDate, saveOrder } from '@/api/orders'
 import type { OrderDetail, Period, Supermarket, VehicleDraft } from '@/types'
 import { todayISO } from '@/utils/date'
+import { quantity as formatQuantity, toNumber } from '@/utils/money'
 
 const markets: Supermarket[] = ['supermarket_1', 'supermarket_2']
 const periods: Period[] = ['morning', 'noon', 'evening']
@@ -19,6 +20,23 @@ function blankVehicle(period: Period): VehicleDraft {
 
 function emptyMarketDraft() {
   return Object.fromEntries(periods.map((period) => [period, [blankVehicle(period)]])) as Record<Period, VehicleDraft[]>
+}
+
+function quantityInput(value: string | number | undefined | null) {
+  const parsed = Math.round(toNumber(value))
+  return parsed > 0 ? String(parsed) : ''
+}
+
+function normalizeDraftQuantities(drafts: Record<Supermarket, Record<Period, VehicleDraft[]>>) {
+  for (const market of markets) {
+    for (const period of periods) {
+      drafts[market][period].forEach((vehicle) => {
+        vehicle.items.forEach((item) => {
+          item.quantity = quantityInput(item.quantity)
+        })
+      })
+    }
+  }
 }
 
 function storageKey(date: string) {
@@ -57,6 +75,7 @@ export const useOrderStore = defineStore('orders', {
       const raw = localStorage.getItem(storageKey(this.currentDate))
       if (raw) {
         this.drafts = JSON.parse(raw)
+        normalizeDraftQuantities(this.drafts)
       }
       this.loadLoadedPeriods()
     },
@@ -133,7 +152,7 @@ export const useOrderStore = defineStore('orders', {
             period: vehicle.period as Period,
             vehicle_no: vehicle.vehicle_no,
             checked: Boolean(previous?.checked),
-            items: vehicle.items.map((item) => ({ product_id: item.product_id || '', quantity: item.quantity })),
+            items: vehicle.items.map((item) => ({ product_id: item.product_id || '', quantity: formatQuantity(item.quantity) })),
           })
         }
         for (const period of periods) {

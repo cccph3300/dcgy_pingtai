@@ -26,7 +26,16 @@ def list_orders(
         conditions.append(Order.order_date >= start_date)
     if end_date:
         conditions.append(Order.order_date <= end_date)
-    orders = list(db.scalars(select(Order).where(and_(*conditions)).order_by(Order.order_date.desc())).all())
+    orders = list(
+        db.scalars(
+            select(Order)
+            .options(joinedload(Order.vehicles).joinedload(OrderVehicle.items))
+            .where(and_(*conditions))
+            .order_by(Order.order_date.desc())
+        )
+        .unique()
+        .all()
+    )
     return summarize_days(orders)
 
 

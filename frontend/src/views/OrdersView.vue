@@ -1,16 +1,22 @@
 <template>
   <AppShell>
-    <TopBar title="订单" />
-    <section class="filter-card card">
-      <input v-model="startDate" class="field" type="date" @change="load" />
-      <span>~</span>
-      <input v-model="endDate" class="field" type="date" @change="load" />
-    </section>
+    <div class="orders-sticky">
+      <TopBar title="订单" />
+      <section class="filter-card card">
+        <input v-model="startDate" class="field" type="date" @change="load" />
+        <span>~</span>
+        <input v-model="endDate" class="field" type="date" @change="load" />
+      </section>
+    </div>
 
     <section class="stats-grid">
       <div class="card stat-card">
         <span>总金额</span>
         <strong>{{ currency(stats.total_amount) }}</strong>
+      </div>
+      <div class="card stat-card">
+        <span>总抽佣</span>
+        <strong>{{ currency(stats.total_commission) }}</strong>
       </div>
       <div class="card stat-card">
         <span>总利润</span>
@@ -25,10 +31,12 @@
         <strong>{{ marketName(order.supermarket) }}</strong>
         <span>金额：{{ currency(order.total_amount) }}</span>
         <span>利润：{{ currency(order.total_profit) }}</span>
+        <span>抽佣：{{ currency(order.total_commission) }}</span>
       </div>
       <footer>
         <span>总金额：{{ currency(day.total_amount) }}</span>
         <span class="money-red">总利润：{{ currency(day.total_profit) }}</span>
+        <span>总抽佣：{{ currency(day.total_commission) }}</span>
         <ChevronRight :size="18" />
       </footer>
     </section>
@@ -52,7 +60,7 @@ import { currency } from '@/utils/money'
 const startDate = ref(monthStartISO())
 const endDate = ref(todayISO())
 const days = ref<DaySummary[]>([])
-const stats = ref({ total_amount: '0.00', total_profit: '0.00' })
+const stats = ref({ total_amount: '0.00', total_profit: '0.00', total_commission: '0.00' })
 
 onMounted(load)
 
@@ -68,6 +76,16 @@ function orderedMarkets(orders: OrderDetail[]) {
 </script>
 
 <style scoped>
+.orders-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin: calc(-12px - env(safe-area-inset-top)) -12px 10px;
+  padding: calc(12px + env(safe-area-inset-top)) 12px 8px;
+  background: #fbfbfd;
+  border-bottom: 1px solid var(--line);
+}
+
 .filter-card {
   display: grid;
   grid-template-columns: 1fr 20px 1fr;
@@ -79,7 +97,7 @@ function orderedMarkets(orders: OrderDetail[]) {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   margin: 10px 0;
 }
@@ -118,13 +136,18 @@ function orderedMarkets(orders: OrderDetail[]) {
   font-size: 14px;
 }
 
+.market-summary span:last-child {
+  grid-column: 2 / -1;
+}
+
 footer {
   display: grid;
-  grid-template-columns: 1fr 1fr 24px;
+  grid-template-columns: 1fr 1fr 1fr 24px;
   align-items: center;
   margin-top: 10px;
   padding-top: 10px;
   border-top: 1px solid var(--line);
   font-weight: 600;
+  font-size: 13px;
 }
 </style>

@@ -4,8 +4,8 @@
       <div class="login-avatar">
         <UserRound :size="52" />
       </div>
-      <h1>东成果业</h1>
-      <p>入账订单管理系统</p>
+      <h1>超市配送</h1>
+      <p>超市配送管理系统</p>
       <form @submit.prevent="submit">
         <input v-model="username" class="field" placeholder="账号" autocomplete="username" />
         <input v-model="password" class="field" placeholder="密码" type="password" autocomplete="current-password" />

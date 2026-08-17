@@ -113,7 +113,7 @@ def save_order(db: Session, user: User, payload: OrderSaveIn) -> Order:
             product, market = get_orderable_product(db, user, item_payload.product_id, payload.supermarket)
             quantity = money(item_payload.quantity)
             unit_profit = calculate_unit_profit(market.sale_price, product.cost, market.commission_price)
-            total_amount = money(quantity * market.sale_price)
+            total_amount = money(quantity * (market.sale_price - market.commission_price))
             total_profit = money(quantity * unit_profit)
             db.add(
                 OrderItem(
@@ -185,12 +185,15 @@ def summarize_days(orders: list[Order]) -> list[dict]:
                 "orders": day_orders,
                 "total_amount": money(sum((item.total_amount for item in day_orders), Decimal("0.00"))),
                 "total_profit": money(sum((item.total_profit for item in day_orders), Decimal("0.00"))),
+                "total_commission": money(sum((item.total_commission for item in day_orders), Decimal("0.00"))),
             }
         )
     return result
 
 
-def statistics_query(db: Session, user: User, start_date: date | None = None, end_date: date | None = None) -> tuple[Decimal, Decimal, Decimal, Decimal]:
+def statistics_query(
+    db: Session, user: User, start_date: date | None = None, end_date: date | None = None
+) -> tuple[Decimal, Decimal, Decimal, Decimal, Decimal]:
     conditions = [Order.user_id == user.id]
     if start_date:
         conditions.append(Order.order_date >= start_date)
@@ -203,6 +206,13 @@ def statistics_query(db: Session, user: User, start_date: date | None = None, en
     ).one()
     total_amount = money(Decimal(row[0]))
     total_profit = money(Decimal(row[1]))
+    commission_row = db.execute(
+        select(func.coalesce(func.sum(OrderItem.commission_price * OrderItem.quantity), 0))
+        .join(OrderVehicle, OrderItem.vehicle_id == OrderVehicle.id)
+        .join(Order, OrderVehicle.order_id == Order.id)
+        .where(and_(*conditions))
+    ).one()
+    total_commission = money(Decimal(commission_row[0]))
     withdrawn = db.scalar(
         select(func.coalesce(func.sum(Withdrawal.amount), 0)).where(
             Withdrawal.user_id == user.id,
@@ -213,4 +223,4 @@ def statistics_query(db: Session, user: User, start_date: date | None = None, en
     available_amount = money(total_amount - withdrawn_amount)
     if available_amount < Decimal("0.00"):
         available_amount = Decimal("0.00")
-    return total_amount, total_profit, withdrawn_amount, available_amount
+    return total_amount, total_profit, total_commission, withdrawn_amount, available_amount

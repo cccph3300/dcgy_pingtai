@@ -38,7 +38,11 @@
       <div>
         <h2>{{ product.name }}</h2>
         <p class="product-meta">成本：{{ product.cost }}　净果：{{ product.net_weight }}　毛重：{{ product.gross_weight }}</p>
-        <p>{{ product.supermarkets.map((item) => `${marketName(item.supermarket)} 售价${item.sale_price} 抽佣${item.commission_price}`).join(' / ') }}</p>
+        <p class="market-lines">
+          <span v-for="item in product.supermarkets" :key="item.id || item.supermarket" class="market-line">
+            {{ marketName(item.supermarket) }} 售价{{ item.sale_price }} 抽佣{{ item.commission_price }}
+          </span>
+        </p>
       </div>
       <div class="product-actions">
         <button class="ghost-button" type="button" @click="startEdit(product)">编辑</button>
@@ -52,6 +56,19 @@
       <span>{{ page }} / {{ totalPages }}</span>
       <button type="button" :disabled="page === totalPages" @click="page += 1">下一页</button>
     </section>
+
+    <div v-if="pendingDeleteProduct" class="confirm-mask" @click.self="pendingDeleteProduct = null">
+      <section class="confirm-panel card">
+        <h3>确认删除</h3>
+        <p>确定删除「{{ pendingDeleteProduct.name }}」吗？删除后库存列表将不再显示该商品。</p>
+        <div class="confirm-actions">
+          <button class="ghost-button" type="button" @click="pendingDeleteProduct = null">取消</button>
+          <button class="danger-button" type="button" :disabled="deletingProductId === pendingDeleteProduct.id" @click="confirmRemove">
+            {{ deletingProductId === pendingDeleteProduct.id ? '删除中' : '确认删除' }}
+          </button>
+        </div>
+      </section>
+    </div>
   </AppShell>
 </template>
 
@@ -71,8 +88,9 @@ import { marketName } from '@/utils/market'
 const productStore = useProductStore()
 const keyword = ref('')
 const page = ref(1)
-const pageSize = 3
+const pageSize = 4
 const deletingProductId = ref<number | null>(null)
+const pendingDeleteProduct = ref<Product | null>(null)
 const editing = ref<{ id?: number; name: string; net_weight: string; gross_weight: string; cost: string } | null>(null)
 const enabledMarkets = ref<Supermarket[]>([])
 const marketForm = reactive<Record<Supermarket, ProductMarket>>({
@@ -133,11 +151,17 @@ async function save() {
   await productStore.fetchProducts()
 }
 
-async function remove(product: Product) {
-  if (!window.confirm(`确定删除「${product.name}」吗？`)) return
+function remove(product: Product) {
+  pendingDeleteProduct.value = product
+}
+
+async function confirmRemove() {
+  const product = pendingDeleteProduct.value
+  if (!product) return
   deletingProductId.value = product.id
   try {
     await deleteProduct(product.id)
+    pendingDeleteProduct.value = null
     await productStore.fetchProducts()
   } catch (error) {
     const message = error instanceof ApiError ? error.message : '删除失败，请稍后重试'
@@ -226,17 +250,31 @@ h2 {
   gap: 10px;
   margin-bottom: 10px;
   padding: 14px;
+  font-size: 13px;
+}
+
+.product-card h2 {
+  font-size: 16px;
 }
 
 .product-card p {
   margin: 7px 0 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.4;
 }
 
 .product-meta {
   white-space: nowrap;
+}
+
+.market-lines {
+  display: grid;
+  gap: 3px;
+}
+
+.market-line {
+  display: block;
 }
 
 .product-actions {
@@ -266,5 +304,40 @@ h2 {
 .pagination button:disabled {
   color: var(--muted);
   background: rgba(134, 134, 139, 0.1);
+}
+
+.confirm-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.32);
+}
+
+.confirm-panel {
+  display: grid;
+  width: min(100%, 360px);
+  gap: 12px;
+  padding: 18px;
+}
+
+.confirm-panel h3,
+.confirm-panel p {
+  margin: 0;
+}
+
+.confirm-panel p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 </style>

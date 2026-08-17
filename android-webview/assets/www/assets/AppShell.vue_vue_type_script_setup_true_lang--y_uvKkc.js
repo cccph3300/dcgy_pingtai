@@ -1,4 +1,4 @@
-import{d as r,c as n,a as e,C as h,F as d,q as c,o as t,B as i,b as k,n as y,l as m,H as M,t as _}from"./index-DHABQMBL.js";import{c as o,U as v}from"./user-round-CMy1LpA2.js";/**
+import{d as r,c as n,a as e,E as h,F as d,q as c,o as t,D as i,b as k,n as y,l as m,J as M,t as _}from"./index-CsM9_UgH.js";import{c as o,U as v}from"./user-round-B_2ym-WE.js";/**
  * @license lucide-vue-next v0.468.0 - ISC
  *
  * This source code is licensed under the ISC license.
@@ -13,4 +13,4 @@ import{d as r,c as n,a as e,C as h,F as d,q as c,o as t,B as i,b as k,n as y,l a
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
- */const f=o("FileTextIcon",[["path",{d:"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z",key:"1rqfz7"}],["path",{d:"M14 2v4a2 2 0 0 0 2 2h4",key:"tnqrlb"}],["path",{d:"M10 9H8",key:"b1mrlr"}],["path",{d:"M16 13H8",key:"t4e002"}],["path",{d:"M16 17H8",key:"z1uh3a"}]]),x={class:"app-shell"},g={class:"page-content"},L={class:"tabbar"},w=r({__name:"AppShell",setup(z){const s=[{label:"点单",path:"/",icon:b},{label:"订单",path:"/orders",icon:f},{label:"库存",path:"/inventory",icon:u},{label:"我的",path:"/profile",icon:v}];return(p,B)=>{const l=i("RouterLink");return t(),n("main",x,[e("section",g,[h(p.$slots,"default")]),e("nav",L,[(t(),n(d,null,c(s,a=>k(l,{key:a.path,class:"tabbar-item",to:a.path},{default:y(()=>[(t(),m(M(a.icon),{size:21})),e("span",null,_(a.label),1)]),_:2},1032,["to"])),64))])])}}});export{w as _};
+ */const f=o("FileTextIcon",[["path",{d:"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z",key:"1rqfz7"}],["path",{d:"M14 2v4a2 2 0 0 0 2 2h4",key:"tnqrlb"}],["path",{d:"M10 9H8",key:"b1mrlr"}],["path",{d:"M16 13H8",key:"t4e002"}],["path",{d:"M16 17H8",key:"z1uh3a"}]]),x={class:"app-shell"},g={class:"page-content"},L={class:"tabbar"},C=r({__name:"AppShell",setup(z){const s=[{label:"点单",path:"/",icon:b},{label:"订单",path:"/orders",icon:f},{label:"库存",path:"/inventory",icon:u},{label:"我的",path:"/profile",icon:v}];return(p,V)=>{const l=i("RouterLink");return t(),n("main",x,[e("section",g,[h(p.$slots,"default")]),e("nav",L,[(t(),n(d,null,c(s,a=>k(l,{key:a.path,class:"tabbar-item",to:a.path},{default:y(()=>[(t(),m(M(a.icon),{size:21})),e("span",null,_(a.label),1)]),_:2},1032,["to"])),64))])])}}});export{C as _};

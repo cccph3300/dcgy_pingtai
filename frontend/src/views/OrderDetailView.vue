@@ -10,16 +10,33 @@
         <span>总利润</span>
         <strong class="money-red">{{ currency(grandTotal.profit) }}</strong>
       </div>
+      <div>
+        <span>总抽佣</span>
+        <strong>{{ currency(grandTotal.commission) }}</strong>
+      </div>
     </section>
-    <div v-if="orders.length > 1" class="segmented market-tabs">
+    <div v-if="orders.length > 1" class="market-tabs">
       <button
         v-for="order in orderedOrders"
         :key="order.id"
+        class="market-tab"
         :class="{ active: selectedOrderId === order.id }"
         type="button"
         @click="selectOrder(order.id)"
       >
-        {{ marketName(order.supermarket) }}
+        <strong>{{ marketName(order.supermarket) }}</strong>
+        <span>
+          <small>总金额</small>
+          <b>{{ currency(order.total_amount) }}</b>
+        </span>
+        <span>
+          <small>总利润</small>
+          <b class="money-red">{{ currency(order.total_profit) }}</b>
+        </span>
+        <span>
+          <small>总抽佣</small>
+          <b>{{ currency(order.total_commission) }}</b>
+        </span>
       </button>
     </div>
     <EmptyState v-if="!orders.length" text="当天暂无订单" />
@@ -38,18 +55,21 @@
             <span>件数</span>
             <span>金额(元)</span>
             <span>利润(元)</span>
+            <span>抽佣(元)</span>
           </div>
           <div v-for="item in aggregate(selectedOrder)" :key="item.name" class="detail-row">
             <span>{{ item.name }}</span>
             <span>{{ item.quantity }}</span>
             <span>{{ item.amount }}</span>
             <span>{{ item.profit }}</span>
+            <span>{{ item.commission }}</span>
           </div>
           <div class="detail-row total">
             <strong>商品合计</strong>
             <strong>{{ productTotals(selectedOrder).quantity }}</strong>
             <strong>{{ productTotals(selectedOrder).amount }}</strong>
             <strong>{{ productTotals(selectedOrder).profit }}</strong>
+            <strong>{{ productTotals(selectedOrder).commission }}</strong>
           </div>
         </div>
 
@@ -86,41 +106,72 @@
               <span>车号</span>
               <span>货物</span>
               <span>件数</span>
-              <span>金额</span>
-              <span>利润</span>
-              <span>操作</span>
             </div>
             <template v-for="vehicle in editDraft[period.key]" :key="vehicle.id">
-              <div v-for="(item, index) in vehicle.items" :key="`${vehicle.id}-${index}`" class="edit-row">
-                <input v-if="index === 0" v-model="vehicle.vehicle_no" class="cell-input" placeholder="车号" />
-                <span v-else class="sub-vehicle"></span>
-                <button class="product-picker-button" type="button" @click="openProductPicker(item)">
-                  {{ productName(item.product_id) || '货物' }}
-                </button>
-                <input
-                  v-model="item.quantity"
-                  class="cell-input"
-                  type="number"
-                  inputmode="numeric"
-                  step="1"
-                  min="0"
-                  placeholder="件数"
-                  @input="normalizeQuantity(item)"
-                />
-                <span class="number-cell">{{ previewItem(item).amount }}</span>
-                <span class="number-cell blue">{{ previewItem(item).profit }}</span>
-                <button class="small-plus" type="button" title="给当前车号添加货物" @click="addEditItem(vehicle)">
-                  <Plus :size="16" />
-                </button>
-              </div>
-              <button
-                v-if="vehicle.vehicle_no || vehicle.items.some((item) => item.product_id)"
-                class="delete-line"
-                type="button"
-                @click="removeEditVehicle(period.key, vehicle.id)"
+              <div
+                v-for="(item, index) in vehicle.items"
+                :key="`${vehicle.id}-${index}`"
+                class="swipe-row"
+                :class="{
+                  'delete-open': openedDetailSwipeRow === rowKey(vehicle.id, index),
+                  'move-open': openedDetailMoveSwipeRow === rowKey(vehicle.id, index),
+                }"
+                @touchstart.passive="startDetailSwipe(rowKey(vehicle.id, index), $event)"
+                @touchend.passive="endDetailSwipe(rowKey(vehicle.id, index), index === 0, $event)"
               >
-                删除车号
-              </button>
+                <button class="swipe-move" v-if="index === 0" type="button" @click="openEditVehicleMove(period.key, vehicle)">
+                  移动
+                </button>
+                <div class="edit-row" @click="closeDetailSwipeRows">
+                  <div
+                    class="vehicle-cell"
+                    :class="{ empty: index !== 0, moving: movingEditVehicle?.vehicleId === vehicle.id }"
+                  >
+                    <template v-if="index === 0">
+                      <button
+                        v-if="editingDetailVehicleId !== vehicle.id"
+                        class="vehicle-number"
+                        type="button"
+                        @click.stop="startDetailVehicleEdit(vehicle.id)"
+                        @contextmenu.prevent
+                      >
+                        {{ vehicle.vehicle_no || '车号' }}
+                      </button>
+                      <input
+                        v-else
+                        v-model="vehicle.vehicle_no"
+                        class="cell-input vehicle-input"
+                        placeholder="车号"
+                        @blur="finishDetailVehicleEdit"
+                        @keydown.enter.prevent="finishDetailVehicleEdit"
+                      />
+                    </template>
+                  </div>
+                  <button class="product-picker-button" type="button" @click="openProductPicker(item)">
+                    {{ productName(item.product_id) || '货物' }}
+                  </button>
+                  <label class="quantity-cell">
+                    <input
+                      v-model="item.quantity"
+                      class="cell-input quantity-input"
+                      type="number"
+                      inputmode="numeric"
+                      step="1"
+                      min="0"
+                      placeholder="0"
+                      @input="normalizeQuantity(item)"
+                    />
+                  </label>
+                  <div class="item-detail-row">
+                    <span class="number-cell">金额 {{ previewItem(item).amount }}</span>
+                    <span class="number-cell blue">利润 {{ previewItem(item).profit }}</span>
+                    <button class="small-plus" type="button" title="给当前车号添加货物" @click="addEditItem(vehicle)">
+                      <Plus :size="16" />
+                    </button>
+                  </div>
+                </div>
+                <button class="swipe-delete" type="button" @click="askRemoveEditItem(period.key, vehicle, index)">删除</button>
+              </div>
             </template>
           </div>
         </section>
@@ -156,6 +207,36 @@
       <button class="ghost-button save-adjust" type="button" @click="saveAdjustments(selectedOrder)">保存调整</button>
     </section>
 
+    <div v-if="pendingDeleteEditItem" class="confirm-mask" @click.self="pendingDeleteEditItem = null">
+      <section class="confirm-panel card">
+        <h3>确认删除</h3>
+        <p>确定删除「{{ pendingDeleteEditItem.productName }}」吗？如果该车号没有货物了，会自动删除这一条车号。</p>
+        <div class="confirm-actions">
+          <button class="ghost-button" type="button" @click="pendingDeleteEditItem = null">取消</button>
+          <button class="danger-button" type="button" @click="confirmRemoveEditItem">确认删除</button>
+        </div>
+      </section>
+    </div>
+
+    <div v-if="movingEditVehicle" class="move-mask" @click.self="movingEditVehicle = null">
+      <section class="move-panel card">
+        <h3>移动车号 {{ movingEditVehicle.vehicleNo || '未填写' }}</h3>
+        <div class="move-targets">
+          <button
+            v-for="period in periodDefs"
+            :key="period.key"
+            type="button"
+            :class="period.key"
+            :disabled="period.key === movingEditVehicle.from"
+            @click="moveEditVehicleToPeriod(period.key)"
+          >
+            {{ period.label }}
+          </button>
+        </div>
+        <button class="ghost-button" type="button" @click="movingEditVehicle = null">取消</button>
+      </section>
+    </div>
+
     <div v-if="pickingItem" class="picker-mask" @click.self="closeProductPicker">
       <section class="picker-panel card">
         <header>
@@ -171,7 +252,7 @@
           @click="selectProduct(product.id)"
         >
           <span>{{ product.name }}</span>
-          <small>售价 {{ marketInfo(product)?.sale_price }} / 成本 {{ product.cost }}</small>
+          <small>售价 {{ marketInfo(product)?.sale_price }} / 成本 {{ product.cost }} / 净果 {{ product.net_weight }} / 毛重 {{ product.gross_weight }}</small>
         </button>
         <EmptyState v-if="!filteredPickerProducts.length" text="没有匹配的货物" />
       </section>
@@ -205,6 +286,12 @@ const savingDetail = ref(false)
 const detailError = ref('')
 const pickingItem = ref<OrderItemInput | null>(null)
 const productKeyword = ref('')
+const pendingDeleteEditItem = ref<{ period: Period; vehicleId: string; itemIndex: number; productName: string } | null>(null)
+const openedDetailSwipeRow = ref('')
+const openedDetailMoveSwipeRow = ref('')
+const detailSwipeStartX = ref<Record<string, number>>({})
+const movingEditVehicle = ref<{ from: Period; vehicleId: string; vehicleNo: string } | null>(null)
+const editingDetailVehicleId = ref('')
 
 const periodDefs: { key: Period; label: string }[] = [
   { key: 'morning', label: '早' },
@@ -279,6 +366,7 @@ const marketProducts = computed(() => {
 const groupedVehicles = computed(() => {
   if (!selectedOrder.value) return []
   const map = new Map<string, { vehicle_no: string; periods: Period[]; vehicles: OrderVehicle[] }>()
+  const periodOrder: Period[] = ['morning', 'noon', 'evening']
   for (const vehicle of selectedOrder.value.vehicles) {
     const key = vehicle.vehicle_no || '未填写车号'
     const current = map.get(key) || { vehicle_no: key, periods: [], vehicles: [] }
@@ -287,12 +375,16 @@ const groupedVehicles = computed(() => {
     current.vehicles.push(vehicle)
     map.set(key, current)
   }
-  const periodOrder: Period[] = ['morning', 'noon', 'evening']
   return [...map.values()].map((group) => ({
     ...group,
     periods: group.periods.sort((a, b) => periodOrder.indexOf(a) - periodOrder.indexOf(b)),
     vehicles: group.vehicles.sort((a, b) => periodOrder.indexOf(a.period as Period) - periodOrder.indexOf(b.period as Period)),
-  }))
+  })).sort((a, b) => {
+    const aPeriod = Math.min(...a.periods.map((period) => periodOrder.indexOf(period)))
+    const bPeriod = Math.min(...b.periods.map((period) => periodOrder.indexOf(period)))
+    if (aPeriod !== bPeriod) return aPeriod - bPeriod
+    return a.vehicle_no.localeCompare(b.vehicle_no, 'zh-Hans-CN', { numeric: true, sensitivity: 'base' })
+  })
 })
 
 function toggleVehicle(vehicleNo: string) {
@@ -335,13 +427,20 @@ function vehicleGroupItems(group: { vehicles: OrderVehicle[] }) {
 }
 
 function aggregate(order: OrderDetail) {
-  const map = new Map<string, { name: string; quantity: number; amount: number; profit: number }>()
+  const map = new Map<string, { name: string; quantity: number; amount: number; profit: number; commission: number }>()
   for (const vehicle of order.vehicles) {
     for (const item of vehicle.items) {
-      const current = map.get(item.product_name_snapshot) || { name: item.product_name_snapshot, quantity: 0, amount: 0, profit: 0 }
+      const current = map.get(item.product_name_snapshot) || {
+        name: item.product_name_snapshot,
+        quantity: 0,
+        amount: 0,
+        profit: 0,
+        commission: 0,
+      }
       current.quantity += toNumber(item.quantity)
       current.amount += toNumber(item.total_amount)
       current.profit += toNumber(item.total_profit)
+      current.commission += toNumber(item.commission_price) * toNumber(item.quantity)
       map.set(item.product_name_snapshot, current)
     }
   }
@@ -350,6 +449,7 @@ function aggregate(order: OrderDetail) {
     quantity: formatQuantity(item.quantity),
     amount: money(item.amount),
     profit: money(item.profit),
+    commission: money(item.commission),
   }))
 }
 
@@ -359,12 +459,14 @@ function productTotals(order: OrderDetail) {
     quantity: formatQuantity(items.reduce((sum, item) => sum + toNumber(item.quantity), 0)),
     amount: money(items.reduce((sum, item) => sum + toNumber(item.total_amount), 0)),
     profit: money(items.reduce((sum, item) => sum + toNumber(item.total_profit), 0)),
+    commission: money(items.reduce((sum, item) => sum + toNumber(item.commission_price) * toNumber(item.quantity), 0)),
   }
 }
 
 const grandTotal = computed(() => ({
   amount: orders.value.reduce((sum, order) => sum + toNumber(order.total_amount), 0),
   profit: orders.value.reduce((sum, order) => sum + toNumber(order.total_profit), 0),
+  commission: orders.value.reduce((sum, order) => sum + toNumber(order.total_commission), 0),
 }))
 
 async function saveAdjustments(order: OrderDetail) {
@@ -405,6 +507,108 @@ function removeEditVehicle(period: Period, vehicleId: string) {
   editDraft.value[period] = list.length > 1 ? list.filter((vehicle) => vehicle.id !== vehicleId) : [blankVehicle(period)]
 }
 
+function startDetailVehicleEdit(vehicleId: string) {
+  if (openedDetailSwipeRow.value.startsWith(`${vehicleId}-`) || openedDetailMoveSwipeRow.value.startsWith(`${vehicleId}-`)) return
+  editingDetailVehicleId.value = vehicleId
+}
+
+function finishDetailVehicleEdit() {
+  editingDetailVehicleId.value = ''
+}
+
+function rowKey(vehicleId: string, itemIndex: number) {
+  return `${vehicleId}-${itemIndex}`
+}
+
+function startDetailSwipe(key: string, event: TouchEvent) {
+  detailSwipeStartX.value[key] = event.changedTouches[0]?.clientX || 0
+}
+
+function closeDetailSwipeRows() {
+  openedDetailSwipeRow.value = ''
+  openedDetailMoveSwipeRow.value = ''
+}
+
+function endDetailSwipe(key: string, canMove: boolean, event: TouchEvent) {
+  const startX = detailSwipeStartX.value[key]
+  const endX = event.changedTouches[0]?.clientX || 0
+  const distance = endX - startX
+  const isDeleteOpen = openedDetailSwipeRow.value === key
+  const isMoveOpen = openedDetailMoveSwipeRow.value === key
+  if (distance < -36) {
+    if (isMoveOpen) {
+      closeDetailSwipeRows()
+      return
+    }
+    openedDetailSwipeRow.value = key
+    openedDetailMoveSwipeRow.value = ''
+    return
+  }
+  if (distance > 36 && canMove) {
+    if (isDeleteOpen) {
+      closeDetailSwipeRows()
+      return
+    }
+    openedDetailMoveSwipeRow.value = key
+    openedDetailSwipeRow.value = ''
+    return
+  }
+  if (distance > 36 && !canMove && openedDetailSwipeRow.value === key) openedDetailSwipeRow.value = ''
+}
+
+function openEditVehicleMove(period: Period, vehicle: VehicleDraft) {
+  movingEditVehicle.value = { from: period, vehicleId: vehicle.id, vehicleNo: vehicle.vehicle_no }
+  closeDetailSwipeRows()
+}
+
+function moveEditVehicleToPeriod(targetPeriod: Period) {
+  const moving = movingEditVehicle.value
+  if (!moving || targetPeriod === moving.from) {
+    movingEditVehicle.value = null
+    return
+  }
+  const sourceList = editDraft.value[moving.from]
+  const sourceIndex = sourceList.findIndex((vehicle) => vehicle.id === moving.vehicleId)
+  if (sourceIndex < 0) {
+    movingEditVehicle.value = null
+    return
+  }
+  const [vehicle] = sourceList.splice(sourceIndex, 1)
+  vehicle.period = targetPeriod
+  const targetList = editDraft.value[targetPeriod]
+  const onlyBlankTarget = targetList.length === 1 && !targetList[0].vehicle_no && !targetList[0].items.some((item) => item.product_id || item.quantity)
+  if (onlyBlankTarget) targetList.splice(0, 1, vehicle)
+  else targetList.push(vehicle)
+  if (!sourceList.length) sourceList.push(blankVehicle(moving.from))
+  movingEditVehicle.value = null
+  closeDetailSwipeRows()
+}
+
+function askRemoveEditItem(period: Period, vehicle: VehicleDraft, itemIndex: number) {
+  const item = vehicle.items[itemIndex]
+  pendingDeleteEditItem.value = {
+    period,
+    vehicleId: vehicle.id,
+    itemIndex,
+    productName: productName(item.product_id) || '未选择货物',
+  }
+}
+
+function confirmRemoveEditItem() {
+  const target = pendingDeleteEditItem.value
+  if (!target) return
+  const vehicle = editDraft.value[target.period].find((item) => item.id === target.vehicleId)
+  if (vehicle) {
+    if (vehicle.items.length > 1) {
+      vehicle.items.splice(target.itemIndex, 1)
+    } else {
+      removeEditVehicle(target.period, target.vehicleId)
+    }
+  }
+  closeDetailSwipeRows()
+  pendingDeleteEditItem.value = null
+}
+
 function findProduct(productId: number | ''): Product | undefined {
   if (!productId) return undefined
   return productStore.products.find((product) => product.id === Number(productId))
@@ -436,6 +640,7 @@ function closeProductPicker() {
 function selectProduct(productId: number) {
   if (!pickingItem.value) return
   pickingItem.value.product_id = productId
+  if (toNumber(pickingItem.value.quantity) <= 0) pickingItem.value.quantity = '1'
   closeProductPicker()
 }
 
@@ -451,7 +656,7 @@ function previewItem(item: OrderItemInput) {
   const quantity = toNumber(item.quantity)
   const unitProfit = toNumber(market.sale_price) - toNumber(product.cost) - toNumber(market.commission_price)
   return {
-    amount: money(quantity * toNumber(market.sale_price)),
+    amount: money(quantity * (toNumber(market.sale_price) - toNumber(market.commission_price))),
     profit: money(quantity * unitProfit),
   }
 }
@@ -499,7 +704,56 @@ function selectedMarketHasLoaded() {
 }
 
 .market-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
   margin-bottom: 12px;
+}
+
+.market-tab {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  min-height: 118px;
+  padding: 10px;
+  color: var(--text);
+  text-align: left;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.market-tab.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.12);
+}
+
+.market-tab strong {
+  color: var(--accent);
+  font-size: 15px;
+  text-align: center;
+}
+
+.market-tab span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12px;
+}
+
+.market-tab small {
+  color: var(--muted);
+}
+
+.market-tab b {
+  overflow: hidden;
+  min-width: 0;
+  font-size: 13px;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 h2,
@@ -532,7 +786,7 @@ h3 {
 .detail-head,
 .detail-row {
   display: grid;
-  grid-template-columns: 1.2fr 0.7fr 1fr 1fr;
+  grid-template-columns: 1.2fr 0.6fr 0.9fr 0.9fr 0.9fr;
   align-items: center;
   min-height: 34px;
   gap: 6px;
@@ -653,9 +907,13 @@ h3 {
 .edit-head,
 .edit-row {
   display: grid;
-  grid-template-columns: 1.1fr 1.1fr 0.75fr 0.85fr 0.85fr 40px;
+  grid-template-columns: 92px minmax(0, 1fr) 58px;
+  grid-template-areas:
+    "vehicle product quantity"
+    "vehicle detail detail";
   align-items: center;
-  gap: 4px;
+  column-gap: 6px;
+  row-gap: 3px;
 }
 
 .edit-head {
@@ -663,43 +921,190 @@ h3 {
   font-size: 12px;
   font-weight: 700;
   color: var(--text);
+  text-align: left;
+}
+
+.edit-head {
+  grid-template-areas: "vehicle product quantity";
+}
+
+.edit-head span:nth-child(1) {
+  grid-area: vehicle;
+}
+
+.edit-head span:nth-child(2) {
+  grid-area: product;
+}
+
+.edit-head span:nth-child(3) {
+  grid-area: quantity;
   text-align: center;
 }
 
-.edit-row {
-  min-height: 42px;
+.swipe-row {
+  position: relative;
+  overflow: hidden;
   border-top: 1px solid var(--line);
+  touch-action: pan-y;
+}
+
+.swipe-row .edit-row {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  background: var(--surface);
+  transition: transform 0.18s ease;
+}
+
+.swipe-row.delete-open .edit-row {
+  transform: translateX(-72px);
+}
+
+.swipe-row.move-open .edit-row {
+  transform: translateX(72px);
+}
+
+.swipe-move,
+.swipe-delete {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 0;
+  width: 72px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  background: var(--danger);
+  transition: right 0.18s ease;
+}
+
+.swipe-move {
+  left: -72px;
+  background: var(--accent);
+  transition: left 0.18s ease;
+}
+
+.swipe-delete {
+  right: -72px;
+}
+
+.swipe-row.move-open .swipe-move {
+  left: 0;
+}
+
+.swipe-row.delete-open .swipe-delete {
+  right: 0;
+}
+
+.edit-row {
+  min-height: 52px;
+  padding: 5px 6px;
 }
 
 .cell-input {
   width: 100%;
-  min-height: 34px;
-  padding: 0 4px;
+  min-height: 30px;
+  padding: 0 6px;
   font-size: 12px;
   text-align: center;
-  background: transparent;
-  border: 0;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 9px;
   outline: none;
 }
 
-.product-picker-button {
+.vehicle-cell {
+  grid-area: vehicle;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 36px;
+}
+
+.vehicle-cell.empty {
+  display: none;
+}
+
+.vehicle-cell.moving .vehicle-input {
+  border-color: rgba(0, 113, 227, 0.55);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+}
+
+.vehicle-cell.moving .vehicle-number {
+  border-color: rgba(0, 113, 227, 0.55);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+}
+
+.vehicle-number {
   width: 100%;
-  min-height: 34px;
-  padding: 0 4px;
-  overflow: hidden;
+  min-height: 32px;
+  padding: 0 6px;
+  color: #111;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.vehicle-input {
+  color: #111;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.product-picker-button {
+  grid-area: product;
+  width: 100%;
+  min-height: 30px;
+  padding: 4px 8px;
+  overflow-wrap: anywhere;
   color: var(--text);
   font-size: 12px;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  background: transparent;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+  white-space: normal;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.quantity-cell {
+  grid-area: quantity;
+  display: block;
+  min-width: 0;
+}
+
+.quantity-input {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.item-detail-row {
+  grid-area: detail;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 4px;
+  min-height: 22px;
 }
 
 .number-cell {
   overflow: hidden;
-  font-size: 12px;
-  text-align: center;
+  min-height: 24px;
+  padding: 0 2px;
+  color: var(--text);
+  font-size: 11px;
+  line-height: 24px;
+  text-align: left;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .blue {
@@ -714,22 +1119,11 @@ h3 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  color: var(--accent);
-  background: transparent;
-}
-
-.delete-line {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
-  min-height: 30px;
-  color: var(--danger);
-  font-size: 12px;
-  background: transparent;
-  border-top: 1px solid var(--line);
+  height: 26px;
+  color: var(--accent);
+  background: rgba(0, 113, 227, 0.08);
+  border-radius: 9px;
 }
 
 .detail-actions {
@@ -737,6 +1131,100 @@ h3 {
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   margin-top: 12px;
+}
+
+.confirm-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.46);
+}
+
+.confirm-panel {
+  display: grid;
+  width: min(100%, 360px);
+  gap: 12px;
+  padding: 18px;
+  background: #fff;
+  border-color: rgba(29, 29, 31, 0.16);
+  box-shadow: 0 16px 46px rgba(0, 0, 0, 0.22);
+}
+
+.confirm-panel h3,
+.confirm-panel p {
+  margin: 0;
+}
+
+.confirm-panel p {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.move-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 42;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.move-panel {
+  display: grid;
+  width: min(100%, 380px);
+  gap: 12px;
+  padding: 16px;
+  background: #fff;
+  border-color: rgba(29, 29, 31, 0.16);
+  box-shadow: 0 16px 46px rgba(0, 0, 0, 0.22);
+}
+
+.move-panel h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.move-targets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.move-targets button {
+  min-height: 44px;
+  color: var(--text);
+  font-weight: 800;
+  border-radius: 12px;
+}
+
+.move-targets .morning {
+  background: var(--morning-bg);
+}
+
+.move-targets .noon {
+  background: var(--noon-bg);
+}
+
+.move-targets .evening {
+  background: var(--evening-bg);
+}
+
+.move-targets button:disabled {
+  color: var(--muted);
+  opacity: 0.55;
 }
 
 .detail-actions button {
@@ -773,8 +1261,8 @@ h3 {
 
 .detail-total {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  padding: 18px;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 14px;
   text-align: center;
 }
 

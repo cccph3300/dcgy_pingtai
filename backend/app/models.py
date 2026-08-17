@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 
 from sqlalchemy import Date, DateTime, ForeignKey, Numeric, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -22,7 +22,7 @@ class User(TimestampMixin, Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255))
-    nickname: Mapped[str] = mapped_column(String(64), default="东成果业")
+    nickname: Mapped[str] = mapped_column(String(64), default="超市配送")
     phone: Mapped[str] = mapped_column(String(32), default="")
     avatar: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
@@ -77,6 +77,14 @@ class Order(TimestampMixin, Base):
     user: Mapped["User"] = relationship(back_populates="orders")
     vehicles: Mapped[list["OrderVehicle"]] = relationship(back_populates="order", cascade="all, delete-orphan")
     adjustments: Mapped[list["OrderAdjustment"]] = relationship(back_populates="order", cascade="all, delete-orphan")
+
+    @property
+    def total_commission(self) -> Decimal:
+        total = sum(
+            (item.commission_price * item.quantity for vehicle in self.vehicles for item in vehicle.items),
+            Decimal("0.00"),
+        )
+        return Decimal(total).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
 class OrderVehicle(TimestampMixin, Base):

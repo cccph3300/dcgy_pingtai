@@ -20,10 +20,11 @@ def get_statistics(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> StatisticsOut:
-    total_amount, total_profit, withdrawn_amount, available_amount = statistics_query(db, user, start_date, end_date)
+    total_amount, total_profit, total_commission, withdrawn_amount, available_amount = statistics_query(db, user, start_date, end_date)
     return StatisticsOut(
         total_amount=total_amount,
         total_profit=total_profit,
+        total_commission=total_commission,
         withdrawn_amount=withdrawn_amount,
         available_withdrawal_amount=available_amount,
     )

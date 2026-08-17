@@ -96,7 +96,8 @@ def test_order_profit_and_vehicle_children(client: TestClient):
     )
     assert response.status_code == 200, response.text
     data = response.json()
-    assert data["total_amount"] == "357.50"
+    assert data["total_amount"] == "325.00"
+    assert data["total_commission"] == "32.50"
     assert data["total_profit"] == "130.00"
     assert len(data["vehicles"]) == 2
     assert len(data["vehicles"][0]["items"]) == 3
@@ -122,7 +123,7 @@ def test_adjustments_change_amount_and_profit(client: TestClient):
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["total_amount"] == "120.00"
+    assert data["total_amount"] == "110.00"
     assert data["total_profit"] == "50.00"
 
 
@@ -180,10 +181,10 @@ def test_withdrawal_requires_available_amount(client: TestClient):
     assert ok.status_code == 200
     stats = client.get("/api/statistics", headers=headers).json()
     assert stats["withdrawn_amount"] == "50.00"
-    assert stats["available_withdrawal_amount"] == "60.00"
+    assert stats["available_withdrawal_amount"] == "50.00"
 
     deleted = client.delete(f"/api/withdrawals/{ok.json()['id']}", headers=headers)
     assert deleted.status_code == 200
     stats_after_delete = client.get("/api/statistics", headers=headers).json()
     assert stats_after_delete["withdrawn_amount"] == "0.00"
-    assert stats_after_delete["available_withdrawal_amount"] == "110.00"
+    assert stats_after_delete["available_withdrawal_amount"] == "100.00"
