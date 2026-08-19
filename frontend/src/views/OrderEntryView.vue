@@ -3,7 +3,12 @@
     <div class="entry-sticky">
       <TopBar :title="displayDate(store.currentDate)">
         <template #right>
-          <input v-model="store.currentDate" class="date-input" type="date" @change="changeDate" />
+          <div class="topbar-actions">
+            <button class="refresh-button" type="button" title="刷新同步" :disabled="refreshing" @click="refreshOrders">
+              <RefreshCw :size="18" :class="{ spinning: refreshing }" />
+            </button>
+            <input v-model="store.currentDate" class="date-input" type="date" @change="changeDate" />
+          </div>
         </template>
       </TopBar>
 
@@ -40,7 +45,7 @@
         <button
           class="loaded-button"
           type="button"
-          :disabled="saving || store.isPeriodLoaded(period.key)"
+          :disabled="saving || autoSaving || store.isPeriodLoaded(period.key)"
           @click="markLoaded(period.key)"
         >
           {{ store.isPeriodLoaded(period.key) ? '已装车' : '装车成功' }}
@@ -52,7 +57,7 @@
           <span>货物</span>
           <span>件数</span>
         </div>
-        <template v-for="vehicle in draft[period.key]" :key="vehicle.id">
+        <template v-for="vehicle in sortedVehicles(period.key)" :key="vehicle.id">
           <section class="vehicle-group">
           <div
             v-for="(item, index) in vehicle.items"
@@ -62,8 +67,8 @@
               'delete-open': openedSwipeRow === rowKey(vehicle.id, index),
               'move-open': openedMoveSwipeRow === rowKey(vehicle.id, index),
             }"
-            @touchstart.passive="startSwipe(rowKey(vehicle.id, index), $event)"
-            @touchend.passive="endSwipe(rowKey(vehicle.id, index), index === 0, $event)"
+            @touchstart.passive="startSwipe(period.key, rowKey(vehicle.id, index), $event)"
+            @touchend.passive="endSwipe(period.key, rowKey(vehicle.id, index), index === 0, $event)"
           >
             <button
               v-if="index === 0 && !store.isPeriodLoaded(period.key)"
@@ -172,18 +177,20 @@
 
     <div class="save-bar card">
       <div>
-        <span>总金额：</span>
-        <strong class="money-red">{{ currency(totalAmount) }}</strong>
-      </div>
-      <div>
-        <span>总利润：</span>
-        <strong class="money-red">{{ currency(totalProfit) }}</strong>
+        <span>收入金额：</span>
+        <strong>{{ currency(totalIncome) }}</strong>
       </div>
       <div>
         <span>总抽佣：</span>
         <strong>{{ currency(totalCommission) }}</strong>
       </div>
-      <button class="primary-button" type="button" :disabled="saving" @click="save">{{ saving ? '保存中' : '保存' }}</button>
+      <div>
+        <span>总利润：</span>
+        <strong class="money-red">{{ currency(totalProfit) }}</strong>
+      </div>
+      <button class="primary-button" type="button" :disabled="saving || autoSaving" @click="save">
+        {{ autoSaving ? '自动保存中' : saving ? '保存中' : '保存' }}
+      </button>
     </div>
     <div class="save-bar-spacer" aria-hidden="true"></div>
 
@@ -243,8 +250,8 @@
 </template>
 
 <script setup lang="ts">
-import { Check, Plus } from 'lucide-vue-next'
-import { computed, onMounted, watch } from 'vue'
+import { Check, Plus, RefreshCw } from 'lucide-vue-next'
+import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -261,6 +268,9 @@ const store = useOrderStore()
 const productStore = useProductStore()
 const route = useRoute()
 const saving = ref(false)
+const autoSaving = ref(false)
+const refreshing = ref(false)
+const hydrating = ref(true)
 const error = ref('')
 const pickingItem = ref<OrderItemInput | null>(null)
 const productKeyword = ref('')
@@ -285,10 +295,21 @@ const defaultVehicleHints: Record<Period, string> = {
   evening: '5 / 13 / 14',
 }
 
-const vehicleHints = ref<Record<Period, string>>({ ...defaultVehicleHints })
+const markets: Supermarket[] = ['supermarket_1', 'supermarket_2']
+
+function emptyVehicleHints() {
+  return Object.fromEntries(markets.map((market) => [market, { ...defaultVehicleHints }])) as Record<
+    Supermarket,
+    Record<Period, string>
+  >
+}
+
+const vehicleHints = ref<Record<Supermarket, Record<Period, string>>>(emptyVehicleHints())
 
 const draft = computed(() => store.drafts[store.currentSupermarket])
 const marketProducts = computed(() => productStore.activeForMarket(store.currentSupermarket))
+let autoSaveTimer: ReturnType<typeof setTimeout> | null = null
+let autoSaveSequence = 0
 
 onMounted(async () => {
   loadVehicleHints()
@@ -299,6 +320,12 @@ onMounted(async () => {
   if (queryMarket) store.currentSupermarket = queryMarket
   if (route.query.edit === '1') store.unlockCurrentMarket()
   await Promise.all([productStore.fetchProducts(), store.fetchDateOrders().catch(() => undefined)])
+  hydrating.value = false
+})
+
+onBeforeUnmount(() => {
+  store.persistLocalDraft()
+  clearAutoSaveTimer()
 })
 
 watch(
@@ -306,13 +333,36 @@ watch(
   () => store.persistLocalDraft(),
 )
 
+watch(
+  () => store.drafts,
+  () => scheduleAutoSave(),
+  { deep: true, flush: 'sync' },
+)
+
 function switchMarket(market: Supermarket) {
   store.currentSupermarket = market
 }
 
 async function changeDate() {
+  hydrating.value = true
+  error.value = ''
   store.setDate(store.currentDate)
   await store.fetchDateOrders().catch(() => undefined)
+  hydrating.value = false
+}
+
+async function refreshOrders() {
+  clearAutoSaveTimer()
+  refreshing.value = true
+  error.value = ''
+  closeSwipeRows()
+  try {
+    await store.fetchDateOrders({ preserveLocalDraft: false })
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : '刷新同步失败'
+  } finally {
+    refreshing.value = false
+  }
 }
 
 function findProduct(productId: number | ''): Product | undefined {
@@ -329,7 +379,7 @@ function marketInfo(product: Product) {
 }
 
 function vehicleHint(period: Period) {
-  return `车辆 ${vehicleHints.value[period]}`
+  return `车辆 ${vehicleHints.value[store.currentSupermarket][period]}`
 }
 
 function vehicleHintsKey() {
@@ -340,9 +390,9 @@ function loadVehicleHints() {
   const raw = localStorage.getItem(vehicleHintsKey())
   if (!raw) return
   try {
-    vehicleHints.value = { ...defaultVehicleHints, ...JSON.parse(raw) }
+    vehicleHints.value = normalizeVehicleHints(JSON.parse(raw))
   } catch {
-    vehicleHints.value = { ...defaultVehicleHints }
+    vehicleHints.value = emptyVehicleHints()
   }
 }
 
@@ -350,10 +400,103 @@ function persistVehicleHints() {
   localStorage.setItem(vehicleHintsKey(), JSON.stringify(vehicleHints.value))
 }
 
+function clearAutoSaveTimer() {
+  if (!autoSaveTimer) return
+  clearTimeout(autoSaveTimer)
+  autoSaveTimer = null
+}
+
+function hasSyncableDraft() {
+  return Object.values(draft.value)
+    .flat()
+    .some((vehicle) => vehicle.vehicle_no.trim() || vehicle.items.some((item) => item.product_id && Number(item.quantity) > 0))
+}
+
+function scheduleAutoSave() {
+  if (hydrating.value || refreshing.value || saving.value) return
+  store.persistLocalDraft()
+  error.value = ''
+  clearAutoSaveTimer()
+  autoSaveTimer = setTimeout(() => {
+    void autoSave()
+  }, 800)
+}
+
+async function autoSave() {
+  clearAutoSaveTimer()
+  if (!hasSyncableDraft() || saving.value || refreshing.value) return
+  const sequence = ++autoSaveSequence
+  autoSaving.value = true
+  error.value = ''
+  try {
+    await store.saveCurrent()
+  } catch (err) {
+    // 自动保存失败不打扰录入，草稿已经先写入本地。
+  } finally {
+    if (sequence === autoSaveSequence) autoSaving.value = false
+  }
+}
+
+function periodLabel(period: Period) {
+  return periodDefs.find((item) => item.key === period)?.label || period
+}
+
+function compareVehicleNo(left: string, right: string) {
+  const leftNo = left.trim()
+  const rightNo = right.trim()
+  if (!leftNo && !rightNo) return 0
+  if (!leftNo) return 1
+  if (!rightNo) return -1
+  return leftNo.localeCompare(rightNo, 'zh-Hans-CN', { numeric: true, sensitivity: 'base' })
+}
+
+function sortedVehicles(period: Period) {
+  return [...draft.value[period]].sort((left, right) => compareVehicleNo(left.vehicle_no, right.vehicle_no))
+}
+
+function draftIssueMessages(targetPeriod?: Period) {
+  const messages: string[] = []
+  const targetPeriods = targetPeriod ? periodDefs.filter((item) => item.key === targetPeriod) : periodDefs
+  for (const period of targetPeriods) {
+    sortedVehicles(period.key).forEach((vehicle, vehicleIndex) => {
+      const vehicleNo = vehicle.vehicle_no.trim()
+      const hasItemInput = vehicle.items.some((item) => item.product_id || item.quantity)
+      if (!vehicleNo && hasItemInput) messages.push(`${period.label} 第${vehicleIndex + 1}条：车号未填`)
+      if (vehicleNo && !vehicle.items.some((item) => item.product_id)) messages.push(`${period.label} 第${vehicleIndex + 1}条：货物未填`)
+      vehicle.items.forEach((item, itemIndex) => {
+        const rowText = vehicle.items.length > 1 ? `${period.label} 第${vehicleIndex + 1}条第${itemIndex + 1}个货物` : `${period.label} 第${vehicleIndex + 1}条`
+        if (!item.product_id && item.quantity) messages.push(`${rowText}：货物未填`)
+        if (item.product_id && toNumber(item.quantity) <= 0) messages.push(`${rowText}：件数未填`)
+      })
+    })
+  }
+  return Array.from(new Set(messages))
+}
+
+function isPeriodHintMap(value: unknown): value is Partial<Record<Period, string>> {
+  if (!value || typeof value !== 'object') return false
+  const source = value as Partial<Record<Period, unknown>>
+  return ['morning', 'noon', 'evening'].some((period) => typeof source[period as Period] === 'string')
+}
+
+function normalizeVehicleHints(value: unknown) {
+  const normalized = emptyVehicleHints()
+  if (isPeriodHintMap(value)) {
+    for (const market of markets) normalized[market] = { ...defaultVehicleHints, ...value }
+    return normalized
+  }
+  if (!value || typeof value !== 'object') return normalized
+  const source = value as Partial<Record<Supermarket, unknown>>
+  for (const market of markets) {
+    if (isPeriodHintMap(source[market])) normalized[market] = { ...defaultVehicleHints, ...source[market] }
+  }
+  return normalized
+}
+
 function startEditVehicleHint(period: Period) {
   if (store.isPeriodLoaded(period)) return
   editingVehicleHint.value = period
-  vehicleHintDraft.value = vehicleHints.value[period]
+  vehicleHintDraft.value = vehicleHints.value[store.currentSupermarket][period]
 }
 
 function cancelEditVehicleHint() {
@@ -363,7 +506,7 @@ function cancelEditVehicleHint() {
 
 function finishEditVehicleHint(period: Period) {
   const value = vehicleHintDraft.value.trim()
-  vehicleHints.value[period] = value || defaultVehicleHints[period]
+  vehicleHints.value[store.currentSupermarket][period] = value || defaultVehicleHints[period]
   persistVehicleHints()
   syncVehiclesFromHint(period)
   cancelEditVehicleHint()
@@ -376,7 +519,7 @@ function parseVehicleNumbers(value: string) {
 }
 
 function syncVehiclesFromHint(period: Period) {
-  const numbers = parseVehicleNumbers(vehicleHints.value[period])
+  const numbers = parseVehicleNumbers(vehicleHints.value[store.currentSupermarket][period])
   if (!numbers.length) return
   const list = draft.value[period]
   const used = new Set(list.map((vehicle) => vehicle.vehicle_no.trim()).filter(Boolean))
@@ -428,7 +571,11 @@ function rowKey(vehicleId: string, itemIndex: number) {
   return `${vehicleId}-${itemIndex}`
 }
 
-function startSwipe(key: string, event: TouchEvent) {
+function startSwipe(period: Period, key: string, event: TouchEvent) {
+  if (store.isPeriodLoaded(period)) {
+    closeSwipeRows()
+    return
+  }
   swipeStartX.value[key] = event.changedTouches[0]?.clientX || 0
 }
 
@@ -437,7 +584,11 @@ function closeSwipeRows() {
   openedMoveSwipeRow.value = ''
 }
 
-function endSwipe(key: string, canMove: boolean, event: TouchEvent) {
+function endSwipe(period: Period, key: string, canMove: boolean, event: TouchEvent) {
+  if (store.isPeriodLoaded(period)) {
+    closeSwipeRows()
+    return
+  }
   const startX = swipeStartX.value[key]
   const endX = event.changedTouches[0]?.clientX || 0
   const distance = endX - startX
@@ -542,6 +693,8 @@ const totalCommission = computed(() =>
     .reduce((sum, item) => sum + toNumber(previewItem(item).commission), 0),
 )
 
+const totalIncome = computed(() => totalAmount.value - totalCommission.value)
+
 function askRemoveItem(period: Period, vehicle: VehicleDraft, itemIndex: number) {
   if (store.isPeriodLoaded(period)) return
   const item = vehicle.items[itemIndex]
@@ -567,11 +720,18 @@ function confirmRemoveItem() {
 
 async function markLoaded(period: Period) {
   if (store.isPeriodLoaded(period)) return
+  clearAutoSaveTimer()
+  const issues = draftIssueMessages(period)
+  if (issues.length) {
+    error.value = `${periodLabel(period)}装车失败：${issues.join('；')}`
+    return
+  }
   saving.value = true
   error.value = ''
   try {
     await store.saveCurrent()
     store.markPeriodLoaded(period)
+    closeSwipeRows()
   } catch (err) {
     error.value = err instanceof Error ? err.message : '装车保存失败'
   } finally {
@@ -580,6 +740,12 @@ async function markLoaded(period: Period) {
 }
 
 async function save() {
+  clearAutoSaveTimer()
+  const issues = draftIssueMessages()
+  if (issues.length) {
+    error.value = `保存失败：${issues.join('；')}`
+    return
+  }
   saving.value = true
   error.value = ''
   try {
@@ -602,6 +768,39 @@ async function save() {
   padding: calc(12px + env(safe-area-inset-top)) 12px 8px;
   background: #fbfbfd;
   border-bottom: 1px solid var(--line);
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.refresh-button {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: #eef6ff;
+  color: var(--primary);
+}
+
+.refresh-button:disabled {
+  opacity: 0.65;
+}
+
+.spinning {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .date-input {
@@ -1010,20 +1209,28 @@ async function save() {
   left: 12px;
   z-index: 9;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 82px;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) 76px;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   width: calc(100% - 24px);
   max-width: 656px;
   margin: 0 auto;
   padding: 8px;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .save-bar div {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
+}
+
+.save-bar strong,
+.save-bar span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .save-bar-spacer {

@@ -68,7 +68,7 @@ class OrderItemIn(ApiModel):
 
 
 class OrderVehicleIn(ApiModel):
-    vehicle_no: str = Field(min_length=1, max_length=32)
+    vehicle_no: str = Field(max_length=32)
     period: str
     items: list[OrderItemIn] = Field(default_factory=list)
 

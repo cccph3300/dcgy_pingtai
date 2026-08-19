@@ -183,6 +183,13 @@ def test_withdrawal_requires_available_amount(client: TestClient):
     )
     assert too_much.status_code == 400
 
+    over_income = client.post(
+        "/api/withdrawals",
+        headers=headers,
+        json={"amount": "91.00", "status": "success", "account_type": "微信", "account_mask": "180****2319"},
+    )
+    assert over_income.status_code == 400
+
     ok = client.post(
         "/api/withdrawals",
         headers=headers,
@@ -191,10 +198,10 @@ def test_withdrawal_requires_available_amount(client: TestClient):
     assert ok.status_code == 200
     stats = client.get("/api/statistics", headers=headers).json()
     assert stats["withdrawn_amount"] == "50.00"
-    assert stats["available_withdrawal_amount"] == "50.00"
+    assert stats["available_withdrawal_amount"] == "40.00"
 
     deleted = client.delete(f"/api/withdrawals/{ok.json()['id']}", headers=headers)
     assert deleted.status_code == 200
     stats_after_delete = client.get("/api/statistics", headers=headers).json()
     assert stats_after_delete["withdrawn_amount"] == "0.00"
-    assert stats_after_delete["available_withdrawal_amount"] == "100.00"
+    assert stats_after_delete["available_withdrawal_amount"] == "90.00"

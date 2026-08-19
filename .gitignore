@@ -12,5 +12,13 @@ backend/htmlcov/
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
+android-webview/.gradle/
+android-webview/build/
+android-webview/app/build/
+android-webview/local.properties
+android-webview/assets/www/
+android-webview/build-apk/
+android-webview/output/
+.android-sdk/
 *.log
 .DS_Store

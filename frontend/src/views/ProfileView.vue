@@ -9,12 +9,25 @@
     </section>
 
     <section class="profile-stats">
-      <span>总计金额</span>
-      <strong>{{ currency(total.total_amount) }}</strong>
+      <div class="headline-grid">
+        <div>
+          <span>总金额</span>
+          <strong>{{ currency(total.total_amount) }}</strong>
+        </div>
+        <div>
+          <span>收入金额</span>
+          <strong>{{ currency(total.income_amount) }}</strong>
+        </div>
+      </div>
+      <h2>今日</h2>
       <div class="today-grid">
         <div>
           <span>今日金额</span>
           <b>{{ currency(today.total_amount) }}</b>
+        </div>
+        <div>
+          <span>今日收入</span>
+          <b>{{ currency(today.income_amount) }}</b>
         </div>
         <div>
           <span>今日利润</span>
@@ -25,6 +38,7 @@
           <b>{{ currency(today.total_commission) }}</b>
         </div>
       </div>
+      <h2>提现</h2>
       <div class="withdraw-grid">
         <div>
           <span>已提现金额</span>
@@ -35,6 +49,7 @@
           <b>{{ currency(total.available_withdrawal_amount) }}</b>
         </div>
       </div>
+      <h2>总计</h2>
       <div class="profit-grid">
         <div>
           <span>总利润</span>
@@ -58,15 +73,18 @@
 import { ChevronRight, Settings, UserRound, WalletCards } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
 
+import { getOrdersByDate, listOrders } from '@/api/orders'
 import { getStatistics } from '@/api/statistics'
 import AppShell from '@/components/AppShell.vue'
 import { useUserStore } from '@/stores/user'
+import type { DaySummary, OrderDetail } from '@/types'
 import { todayISO } from '@/utils/date'
-import { currency, maskPhone } from '@/utils/money'
+import { currency, maskPhone, money, toNumber } from '@/utils/money'
 
 const userStore = useUserStore()
 const total = ref({
   total_amount: '0.00',
+  income_amount: '0.00',
   total_profit: '0.00',
   total_commission: '0.00',
   withdrawn_amount: '0.00',
@@ -74,6 +92,7 @@ const total = ref({
 })
 const today = ref({
   total_amount: '0.00',
+  income_amount: '0.00',
   total_profit: '0.00',
   total_commission: '0.00',
   withdrawn_amount: '0.00',
@@ -83,8 +102,42 @@ const today = ref({
 onMounted(async () => {
   await userStore.fetchMe()
   const date = todayISO()
-  ;[total.value, today.value] = await Promise.all([getStatistics(), getStatistics(date, date)])
+  const [totalStats, todayStats, allDays, todayOrders] = await Promise.all([
+    getStatistics(),
+    getStatistics(date, date),
+    listOrders(),
+    getOrdersByDate(date),
+  ])
+  const totalCommission = await totalCommissionFromDetails(allDays)
+  const todayCommission = ordersCommission(todayOrders)
+  total.value = {
+    ...totalStats,
+    income_amount: money(toNumber(totalStats.total_amount) - totalCommission),
+    total_commission: money(totalCommission),
+    available_withdrawal_amount: money(Math.max(0, toNumber(totalStats.total_amount) - totalCommission - toNumber(totalStats.withdrawn_amount))),
+  }
+  today.value = {
+    ...todayStats,
+    income_amount: money(toNumber(todayStats.total_amount) - todayCommission),
+    total_commission: money(todayCommission),
+  }
 })
+
+async function totalCommissionFromDetails(days: DaySummary[]) {
+  const detailsByDate = await Promise.all(days.map((day) => getOrdersByDate(day.date)))
+  return detailsByDate.reduce((sum, orders) => sum + ordersCommission(orders), 0)
+}
+
+function ordersCommission(orders: OrderDetail[]) {
+  return orders.reduce((sum, order) => sum + orderCommission(order), 0)
+}
+
+function orderCommission(order: OrderDetail) {
+  return order.vehicles.reduce(
+    (sum, vehicle) => sum + vehicle.items.reduce((itemSum, item) => itemSum + toNumber(item.commission_price) * toNumber(item.quantity), 0),
+    0,
+  )
+}
 </script>
 
 <style scoped>
@@ -110,6 +163,14 @@ onMounted(async () => {
 h1 {
   margin: 12px 0 4px;
   font-size: 22px;
+}
+
+h2 {
+  margin: 8px 12px -2px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
 }
 
 p {
@@ -138,14 +199,35 @@ p {
 }
 
 .today-grid,
-.withdraw-grid {
+.withdraw-grid,
+.headline-grid {
   display: grid;
   gap: 8px;
   padding: 0 12px;
 }
 
+.headline-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  padding: 0 18px 4px;
+}
+
+.headline-grid div {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.headline-grid strong {
+  color: var(--accent);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
 .today-grid {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .withdraw-grid {

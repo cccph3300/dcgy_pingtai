@@ -43,19 +43,26 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 
+import { getOrdersByDate, listOrders } from '@/api/orders'
 import { createWithdrawal, deleteWithdrawal, listWithdrawals } from '@/api/withdrawals'
 import { getStatistics } from '@/api/statistics'
 import AppShell from '@/components/AppShell.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import TopBar from '@/components/TopBar.vue'
 import { useUserStore } from '@/stores/user'
-import type { Withdrawal } from '@/types'
+import type { DaySummary, OrderDetail, Withdrawal } from '@/types'
 import { currency, maskPhone, money, toNumber } from '@/utils/money'
 
 const records = ref<Withdrawal[]>([])
 const amount = ref('')
 const message = ref('')
-const stats = ref({ total_amount: '0.00', total_profit: '0.00', withdrawn_amount: '0.00', available_withdrawal_amount: '0.00' })
+const stats = ref({
+  total_amount: '0.00',
+  total_profit: '0.00',
+  total_commission: '0.00',
+  withdrawn_amount: '0.00',
+  available_withdrawal_amount: '0.00',
+})
 const userStore = useUserStore()
 const canWithdraw = computed(() => {
   const inputAmount = toNumber(amount.value)
@@ -66,8 +73,31 @@ const canWithdraw = computed(() => {
 onMounted(load)
 
 async function load() {
-  ;[records.value, stats.value] = await Promise.all([listWithdrawals(), getStatistics()])
+  const [withdrawals, statistic, days] = await Promise.all([listWithdrawals(), getStatistics(), listOrders()])
+  const totalCommission = await totalCommissionFromDetails(days)
+  records.value = withdrawals
+  stats.value = {
+    ...statistic,
+    total_commission: money(totalCommission),
+    available_withdrawal_amount: money(Math.max(0, toNumber(statistic.total_amount) - totalCommission - toNumber(statistic.withdrawn_amount))),
+  }
   clampAmount()
+}
+
+async function totalCommissionFromDetails(days: DaySummary[]) {
+  const detailsByDate = await Promise.all(days.map((day) => getOrdersByDate(day.date)))
+  return detailsByDate.reduce((sum, orders) => sum + ordersCommission(orders), 0)
+}
+
+function ordersCommission(orders: OrderDetail[]) {
+  return orders.reduce((sum, order) => sum + orderCommission(order), 0)
+}
+
+function orderCommission(order: OrderDetail) {
+  return order.vehicles.reduce(
+    (sum, vehicle) => sum + vehicle.items.reduce((itemSum, item) => itemSum + toNumber(item.commission_price) * toNumber(item.quantity), 0),
+    0,
+  )
 }
 
 function clampAmount() {

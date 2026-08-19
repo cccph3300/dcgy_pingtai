@@ -7,12 +7,16 @@
         <strong>{{ currency(grandTotal.amount) }}</strong>
       </div>
       <div>
-        <span>总利润</span>
-        <strong class="money-red">{{ currency(grandTotal.profit) }}</strong>
-      </div>
-      <div>
         <span>总抽佣</span>
         <strong>{{ currency(grandTotal.commission) }}</strong>
+      </div>
+      <div>
+        <span>收入金额</span>
+        <strong>{{ currency(grandTotal.income) }}</strong>
+      </div>
+      <div>
+        <span>总利润</span>
+        <strong class="money-red">{{ currency(grandTotal.profit) }}</strong>
       </div>
     </section>
     <div v-if="orders.length > 1" class="market-tabs">
@@ -30,12 +34,16 @@
           <b>{{ currency(order.total_amount) }}</b>
         </span>
         <span>
-          <small>总利润</small>
-          <b class="money-red">{{ currency(order.total_profit) }}</b>
-        </span>
-        <span>
           <small>总抽佣</small>
           <b>{{ currency(orderCommission(order)) }}</b>
+        </span>
+        <span>
+          <small>收入金额</small>
+          <b>{{ currency(orderIncome(order)) }}</b>
+        </span>
+        <span>
+          <small>总利润</small>
+          <b class="money-red">{{ currency(order.total_profit) }}</b>
         </span>
       </button>
     </div>
@@ -331,7 +339,9 @@ function orderToDraft(order: OrderDetail) {
       id: crypto.randomUUID(),
       period,
       vehicle_no: vehicle.vehicle_no,
-      items: vehicle.items.map((item) => ({ product_id: item.product_id || '', quantity: formatQuantity(item.quantity) })),
+      items: vehicle.items.length
+        ? vehicle.items.map((item) => ({ product_id: item.product_id || '', quantity: formatQuantity(item.quantity) }))
+        : [{ product_id: '', quantity: '' }],
     })
   }
   for (const period of periodDefs) {
@@ -472,9 +482,14 @@ function orderCommission(order: OrderDetail) {
 
 const grandTotal = computed(() => ({
   amount: orders.value.reduce((sum, order) => sum + toNumber(order.total_amount), 0),
+  income: orders.value.reduce((sum, order) => sum + orderIncome(order), 0),
   profit: orders.value.reduce((sum, order) => sum + toNumber(order.total_profit), 0),
   commission: orders.value.reduce((sum, order) => sum + orderCommission(order), 0),
 }))
+
+function orderIncome(order: OrderDetail) {
+  return toNumber(order.total_amount) - orderCommission(order)
+}
 
 async function saveAdjustments(order: OrderDetail) {
   const cleaned = order.adjustments.filter((item) => item.name.trim())
@@ -1284,7 +1299,7 @@ h3 {
 
 .detail-total {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   padding: 14px;
   text-align: center;
 }

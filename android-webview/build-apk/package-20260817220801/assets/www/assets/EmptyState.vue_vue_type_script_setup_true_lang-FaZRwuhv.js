@@ -1,1 +1,0 @@
-import{d as e,o as s,c as a,a as o,t as n}from"./index-Czut2-hE.js";const p={class:"empty-state"},m=e({__name:"EmptyState",props:{text:{}},setup(r){return(t,c)=>(s(),a("div",p,[o("p",null,n(t.text),1)]))}});export{m as _};

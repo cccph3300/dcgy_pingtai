@@ -6,7 +6,7 @@ export function saveOrder(order_date: string, supermarket: Supermarket, vehicles
     order_date,
     supermarket,
     vehicles: vehicles
-      .filter((vehicle) => vehicle.vehicle_no.trim() && vehicle.items.some((item) => item.product_id && Number(item.quantity) > 0))
+      .filter((vehicle) => vehicle.vehicle_no.trim() || vehicle.items.some((item) => item.product_id && Number(item.quantity) > 0))
       .map((vehicle) => ({
         vehicle_no: vehicle.vehicle_no.trim(),
         period: vehicle.period,
@@ -18,8 +18,11 @@ export function saveOrder(order_date: string, supermarket: Supermarket, vehicles
   return request<OrderDetail>('/orders', { method: 'POST', body: JSON.stringify(payload) })
 }
 
-export function listOrders(startDate: string, endDate: string) {
-  return request<DaySummary[]>(`/orders?start_date=${startDate}&end_date=${endDate}`)
+export function listOrders(startDate?: string, endDate?: string) {
+  const params = new URLSearchParams()
+  if (startDate) params.set('start_date', startDate)
+  if (endDate) params.set('end_date', endDate)
+  return request<DaySummary[]>(`/orders${params.toString() ? `?${params}` : ''}`)
 }
 
 export function getOrdersByDate(date: string) {

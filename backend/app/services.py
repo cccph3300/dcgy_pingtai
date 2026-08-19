@@ -245,7 +245,8 @@ def statistics_query(
         )
     )
     withdrawn_amount = money(Decimal(withdrawn or 0))
-    available_amount = money(total_amount - withdrawn_amount)
+    income_amount = money(total_amount - total_commission)
+    available_amount = money(income_amount - withdrawn_amount)
     if available_amount < Decimal("0.00"):
         available_amount = Decimal("0.00")
     return total_amount, total_profit, total_commission, withdrawn_amount, available_amount
