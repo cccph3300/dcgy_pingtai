@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     default_admin_phone: str = "18000002319"
     default_admin_nickname: str = "超市配送"
     cors_origins: str = "*"
+    yhlc_base_url: str = "https://admin.dgyhlc.com/prod-api"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

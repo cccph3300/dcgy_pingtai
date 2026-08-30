@@ -31,6 +31,12 @@ export interface Product {
 export interface OrderItemInput {
   product_id: number | ''
   quantity: string
+  yhlc_import?: {
+    car_no: string
+    pz_no: string
+    quantity: string
+    product_id: number
+  }
 }
 
 export interface VehicleDraft {

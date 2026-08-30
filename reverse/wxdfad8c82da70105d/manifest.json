@@ -1,0 +1,26 @@
+{
+  "appid": "wxdfad8c82da70105d",
+  "generatedAt": "2026-08-30T14:19:22.333Z",
+  "packages": [
+    {
+      "package": "_package-supplyGoods_.wxapkg",
+      "files": 110,
+      "outDir": "E:\\project\\dcgy_pingtai\\reverse\\wxdfad8c82da70105d\\unpacked\\_package-supplyGoods_"
+    },
+    {
+      "package": "_package-system_.wxapkg",
+      "files": 172,
+      "outDir": "E:\\project\\dcgy_pingtai\\reverse\\wxdfad8c82da70105d\\unpacked\\_package-system_"
+    },
+    {
+      "package": "_TUIKit_.wxapkg",
+      "files": 229,
+      "outDir": "E:\\project\\dcgy_pingtai\\reverse\\wxdfad8c82da70105d\\unpacked\\_TUIKit_"
+    },
+    {
+      "package": "__APP__.wxapkg",
+      "files": 397,
+      "outDir": "E:\\project\\dcgy_pingtai\\reverse\\wxdfad8c82da70105d\\unpacked\\__APP__"
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "miniProgram": {
+    "name": "般果供应商",
+    "appId": "wxdfad8c82da70105d",
+    "webpackChunk": "webpackChunkbanguo_supplier_uniapp"
+  },
+  "baseUrl": "https://banguo-gateway.banguo.xianlink.cn",
+  "clientid": "u1zazpc5jartv40ufucgteoquttqziu3",
+  "headers": {
+    "Clientid": "u1zazpc5jartv40ufucgteoquttqziu3",
+    "Authorization": "Bearer <access_token>"
+  },
+  "auth": [
+    {
+      "name": "认证检查",
+      "method": "POST",
+      "path": "/auth/wx/auth",
+      "body": {
+        "clientid": "u1zazpc5jartv40ufucgteoquttqziu3",
+        "grantType": "wxmini",
+        "code": "<wx.login code>",
+        "qrToken": "<optional>",
+        "invitationCode": "<optional>"
+      }
+    },
+    {
+      "name": "已绑定登录",
+      "method": "POST",
+      "path": "/auth/wx/binding/login",
+      "body": {
+        "clientid": "u1zazpc5jartv40ufucgteoquttqziu3",
+        "grantType": "wxmini",
+        "code": "<new wx.login code>",
+        "qrToken": "<optional>",
+        "invitationCode": "<optional>"
+      },
+      "tokenField": "data.loginVo.access_token"
+    },
+    {
+      "name": "手机号授权登录",
+      "method": "POST",
+      "path": "/auth/wx/login",
+      "body": {
+        "clientid": "u1zazpc5jartv40ufucgteoquttqziu3",
+        "grantType": "wxmini",
+        "code": "<getPhoneNumber detail.code>",
+        "authKey": "<authKey from /auth/wx/auth>",
+        "qrToken": "<optional>",
+        "invitationCode": "<optional>"
+      },
+      "tokenField": "data.loginVo.access_token"
+    }
+  ],
+  "context": [
+    {
+      "name": "刷新权限",
+      "method": "GET",
+      "path": "/system/user/refresh/perms"
+    },
+    {
+      "name": "当前用户",
+      "method": "GET",
+      "path": "/system/user/getInfo"
+    },
+    {
+      "name": "供应商列表",
+      "method": "GET",
+      "path": "/basic/sup/supplier/getList"
+    },
+    {
+      "name": "当前供应商",
+      "method": "GET",
+      "path": "/basic/sup/supplier/get"
+    },
+    {
+      "name": "可用仓库",
+      "method": "GET",
+      "path": "/basic/sup/white/regionWh/selectList"
+    },
+    {
+      "name": "仓库销售日",
+      "method": "GET",
+      "path": "/basic/admin/regionWh/getSaleDate/{regionWhId}"
+    }
+  ],
+  "delivery": [
+    {
+      "name": "普通送货单列表",
+      "method": "POST",
+      "path": "/order/sup/delivery/page",
+      "body": {
+        "pageNum": 1,
+        "pageSize": 20,
+        "regionWhId": "<regionWhId>",
+        "deliveryNo": "<optional>",
+        "saleDate": "<optional YYYY-MM-DD>",
+        "statusList": "<optional number[]>",
+        "diffStatus": "<optional>"
+      }
+    },
+    {
+      "name": "基采送货单列表",
+      "method": "POST",
+      "path": "/order/sup/delivery/page",
+      "body": {
+        "pageNum": 1,
+        "pageSize": 20,
+        "provideRegionWhId": "<regionWhId>",
+        "sceneType": 1,
+        "deliveryNo": "<optional>",
+        "departureDate": "<optional YYYY-MM-DD>",
+        "statusList": "<optional number[]>"
+      }
+    },
+    {
+      "name": "送货单详情",
+      "method": "GET",
+      "path": "/order/sup/delivery/info/{deliveryId}"
+    },
+    {
+      "name": "标签打印数据",
+      "method": "POST",
+      "path": "/order/sup/delivery/getDeliveryGoodsOrderLabelList",
+      "body": {
+        "deliveryIdList": [
+          "<deliveryId>"
+        ],
+        "sceneType": "<optional>"
+      }
+    }
+  ]
+}

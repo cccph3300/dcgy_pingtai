@@ -1,0 +1,26 @@
+{
+  "appid": "wx6a1192a1b0aa29aa",
+  "generatedAt": "2026-08-30T03:00:42.201Z",
+  "packages": [
+    {
+      "package": "_sub-pages_auth_.wxapkg",
+      "files": 28,
+      "outDir": "E:\\project\\dcgy_pingtai\\reverse\\wx6a1192a1b0aa29aa\\unpacked\\_sub-pages_auth_"
+    },
+    {
+      "package": "_sub-pages_merchant_.wxapkg",
+      "files": 45,
+      "outDir": "E:\\project\\dcgy_pingtai\\reverse\\wx6a1192a1b0aa29aa\\unpacked\\_sub-pages_merchant_"
+    },
+    {
+      "package": "_sub-pages_supply_.wxapkg",
+      "files": 38,
+      "outDir": "E:\\project\\dcgy_pingtai\\reverse\\wx6a1192a1b0aa29aa\\unpacked\\_sub-pages_supply_"
+    },
+    {
+      "package": "__APP__.wxapkg",
+      "files": 83,
+      "outDir": "E:\\project\\dcgy_pingtai\\reverse\\wx6a1192a1b0aa29aa\\unpacked\\__APP__"
+    }
+  ]
+}

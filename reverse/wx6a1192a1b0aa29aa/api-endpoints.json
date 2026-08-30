@@ -1,0 +1,1366 @@
+[
+  {
+    "method": "DELETE",
+    "endpoint": "storage/stock/",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28147
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28125
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/asset",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 100
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 87
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/dayDetail/",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 175
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 162
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/dayItems",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 192
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 179
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/dayList",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 162
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 149
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/exportPdf/",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 320
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 307
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/monthDetail/",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 145
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 132
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/monthList",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 132
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 119
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/productOrders",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 209
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 196
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/recentFlows",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 115
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 102
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/subtypeItems",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 234
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 221
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/todayDeductionItems",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 287
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 274
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/todayProductAgg",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 249
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 236
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/todayProductOrders",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 268
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 255
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "app/supplierBill/withdrawList",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 306
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/appservice.app.js",
+        "line": 293
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "captchaImage",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/app-service.js",
+        "line": 1107
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/chunk_1.appservice.js",
+        "line": 295
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "getInfo",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/app-service.js",
+        "line": 1256
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/chunk_1.appservice.js",
+        "line": 444
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 8616
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/chunk_7.appservice.js",
+        "line": 572
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/afterSaleLoss/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2370
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2348
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/batch/list",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/app-service.js",
+        "line": 11696
+      },
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/chunk_8.appservice.js",
+        "line": 952
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/batchRef/list",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/app-service.js",
+        "line": 5342
+      },
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/app-service.js",
+        "line": 13063
+      },
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/chunk_10.appservice.js",
+        "line": 931
+      },
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/chunk_9.appservice.js",
+        "line": 1233
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/dailySummary/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 1950
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 1928
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/freezeFlow/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2190
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2168
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/lackGoods/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2203
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2181
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/lackGoods/orderProducts",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2242
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2220
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/multiGoods/auditWarehouseOptions",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2357
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2335
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/multiGoods/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2268
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2246
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/multiGoods/matchProduct",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2281
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2259
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/multiGoods/supplierProducts",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2294
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2272
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/priceDiff/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2383
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2361
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/storeOrder/",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 7953
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/chunk_6.appservice.js",
+        "line": 330
+      },
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2000
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 1978
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/storeOrder/cityWarehouseDashboard",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 1937
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 1915
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/storeOrder/completePickup",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 4811
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/chunk_12.appservice.js",
+        "line": 251
+      },
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 1988
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 1966
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/storeOrder/distributeOrder",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 8593
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/chunk_7.appservice.js",
+        "line": 549
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/storeOrder/list",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 8803
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/chunk_7.appservice.js",
+        "line": 759
+      },
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 1924
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 1902
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/storeOrder/revealPhone",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2012
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 1990
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/storeOrder/statistical",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 8781
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/chunk_7.appservice.js",
+        "line": 737
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "order/supplierAccountFlow/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2173
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2151
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "product/app/goodsApplyInfo/",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28523
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28501
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "product/audit/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28432
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28410
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "product/storeCategory/listTree",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28340
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28318
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "product/storeProduct/",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28403
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28381
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "product/storeProduct/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28393
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28371
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "rider/app/",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 8653
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/chunk_7.appservice.js",
+        "line": 609
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "rider/app/getWorkingState",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 8704
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/chunk_7.appservice.js",
+        "line": 660
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "rider/app/loginRider",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/app-service.js",
+        "line": 415
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/chunk_0.appservice.js",
+        "line": 340
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "rider/rider/getRiderByStorageId",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 8564
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 8584
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/chunk_7.appservice.js",
+        "line": 520
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/chunk_7.appservice.js",
+        "line": 540
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "rider/task/abnormal",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 8858
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/chunk_7.appservice.js",
+        "line": 814
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "rider/wxLogin/decryptS5",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/app-service.js",
+        "line": 721
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/app-service.js",
+        "line": 1382
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/chunk_0.appservice.js",
+        "line": 646
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/chunk_1.appservice.js",
+        "line": 570
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "rider/wxLogin/getRiderInfo",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/app-service.js",
+        "line": 521
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/chunk_0.appservice.js",
+        "line": 446
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "storage/position/getAllFirstStorage",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28191
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28169
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "storage/stock/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28085
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28063
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "storage/storage/list",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 8606
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/chunk_7.appservice.js",
+        "line": 562
+      },
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/app-service.js",
+        "line": 8377
+      },
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/app-service.js",
+        "line": 9965
+      },
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/chunk_6.appservice.js",
+        "line": 663
+      },
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/chunk_7.appservice.js",
+        "line": 730
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "storage/storage/listAll",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28201
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28179
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "storage/supplierInfo/",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28048
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28026
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "storage/supplierInfo/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28023
+      },
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28038
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28001
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28016
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "system/allocation/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28220
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28198
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "system/allocationItem/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28237
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28215
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "system/app/bankInfo/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28181
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28159
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "system/app/config/protocol/list",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/app-service.js",
+        "line": 1693
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/chunk_2.appservice.js",
+        "line": 220
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "system/app/dict/data/type/",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/app-service.js",
+        "line": 86
+      },
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/appservice.app.js",
+        "line": 75
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "system/orderPick/list",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28256
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28234
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "system/pickItem/order/",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28266
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28244
+      }
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "system/user/profile",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/app-service.js",
+        "line": 9142
+      },
+      {
+        "file": "unpacked/_sub-pages_merchant_/sub-pages/merchant/chunk_8.appservice.js",
+        "line": 226
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "login",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/app-service.js",
+        "line": 1163
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/chunk_1.appservice.js",
+        "line": 351
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "order/batch",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 1976
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 1954
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "order/dailySummary/skuInfo",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 1963
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 1941
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "order/lackGoods",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2255
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2233
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "order/lackGoods/agree",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2229
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2207
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "order/lackGoods/appeal",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2216
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2194
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "order/multiGoods",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2307
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2285
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "order/multiGoods/platformAudit",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2327
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2305
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "order/multiGoods/recordSellResult",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2347
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2325
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "order/multiGoods/supplierConfirm",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2317
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2295
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "order/multiGoods/warehouseConfirm",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 2337
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 2315
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "order/withdraw",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28059
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28037
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "product/app/goodsShelfBySupplier",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28415
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28393
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "product/storeProduct",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28380
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28358
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "product/storeProduct/batchAuthorizeGoods",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28508
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28486
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "rider/wxLogin/wechatLogin",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/app-service.js",
+        "line": 480
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/app-service.js",
+        "line": 746
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/app-service.js",
+        "line": 1407
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/chunk_0.appservice.js",
+        "line": 405
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/chunk_0.appservice.js",
+        "line": 671
+      },
+      {
+        "file": "unpacked/_sub-pages_auth_/sub-pages/auth/chunk_1.appservice.js",
+        "line": 595
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "storage/stock/applyEditPriceStock",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28116
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28094
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "storage/stock/applyPriceStockInBusinessTime",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28126
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28104
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "storage/stock/applyStockStatus",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28095
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28073
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "storage/stock/cancelStockApply",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28106
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28084
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "storage/stock/reapplyOnShelfAfterAutoOff",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28136
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28114
+      }
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "supplier/app/add",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28171
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28149
+      }
+    ]
+  },
+  {
+    "method": "PUT",
+    "endpoint": "order/batch/gysZc",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/app-service.js",
+        "line": 5292
+      },
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/app-service.js",
+        "line": 12977
+      },
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/chunk_10.appservice.js",
+        "line": 881
+      },
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/chunk_9.appservice.js",
+        "line": 1147
+      }
+    ]
+  },
+  {
+    "method": "PUT",
+    "endpoint": "order/batchRef/batchCheck",
+    "locations": [
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/app-service.js",
+        "line": 12700
+      },
+      {
+        "file": "unpacked/_sub-pages_supply_/sub-pages/supply/chunk_9.appservice.js",
+        "line": 870
+      }
+    ]
+  },
+  {
+    "method": "PUT",
+    "endpoint": "product/audit/batchCheck",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28496
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28474
+      }
+    ]
+  },
+  {
+    "method": "PUT",
+    "endpoint": "product/audit/check",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28477
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28455
+      }
+    ]
+  },
+  {
+    "method": "PUT",
+    "endpoint": "system/pickItem/order/",
+    "locations": [
+      {
+        "file": "unpacked/__APP__/app-service.js",
+        "line": 28282
+      },
+      {
+        "file": "unpacked/__APP__/appservice.app.js",
+        "line": 28260
+      }
+    ]
+  }
+]

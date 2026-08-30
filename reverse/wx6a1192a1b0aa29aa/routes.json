@@ -1,0 +1,265 @@
+{
+  "entryPagePath": "pages/login/index.html",
+  "subPackages": [
+    {
+      "root": "sub-pages/auth/"
+    },
+    {
+      "root": "sub-pages/rider/"
+    },
+    {
+      "root": "sub-pages/merchant/"
+    },
+    {
+      "root": "sub-pages/supply/"
+    },
+    {
+      "root": "sub-pages/after-sale/"
+    },
+    {
+      "root": "sub-pages/warehouse/"
+    },
+    {
+      "root": "sub-pages/product/"
+    },
+    {
+      "root": "sub-pages/printer/"
+    }
+  ],
+  "pages": [
+    {
+      "path": "pages/login/index",
+      "title": ""
+    },
+    {
+      "path": "sub-pages/auth/login",
+      "title": ""
+    },
+    {
+      "path": "sub-pages/auth/merchant",
+      "title": ""
+    },
+    {
+      "path": "sub-pages/auth/register",
+      "title": "供应商注册"
+    },
+    {
+      "path": "sub-pages/auth/privacy-policy",
+      "title": "隐私协议"
+    },
+    {
+      "path": "sub-pages/rider/task/task",
+      "title": ""
+    },
+    {
+      "path": "sub-pages/rider/user/user",
+      "title": "我的"
+    },
+    {
+      "path": "sub-pages/rider/order/order",
+      "title": "订单"
+    },
+    {
+      "path": "sub-pages/rider/income/income",
+      "title": "收入明细"
+    },
+    {
+      "path": "sub-pages/rider/profile/edit",
+      "title": "资料"
+    },
+    {
+      "path": "sub-pages/merchant/dashboard/index",
+      "title": ""
+    },
+    {
+      "path": "sub-pages/merchant/home/index",
+      "title": ""
+    },
+    {
+      "path": "sub-pages/merchant/user/user1",
+      "title": "我的"
+    },
+    {
+      "path": "sub-pages/merchant/user/city-warehouse-dashboard",
+      "title": "城市仓数据看板"
+    },
+    {
+      "path": "sub-pages/merchant/user/log-capture",
+      "title": "日志抓取"
+    },
+    {
+      "path": "sub-pages/merchant/user/change-password",
+      "title": "修改密码"
+    },
+    {
+      "path": "sub-pages/merchant/bill/bill-detail",
+      "title": "结算账单"
+    },
+    {
+      "path": "sub-pages/merchant/bill/bill-day-detail",
+      "title": "账单详情页"
+    },
+    {
+      "path": "sub-pages/merchant/bill/bill-product-orders",
+      "title": "商品订单"
+    },
+    {
+      "path": "sub-pages/merchant/bill/bill-item-details",
+      "title": "流水明细"
+    },
+    {
+      "path": "sub-pages/merchant/task/task1",
+      "title": ""
+    },
+    {
+      "path": "sub-pages/merchant/order/order1",
+      "title": "订单"
+    },
+    {
+      "path": "sub-pages/merchant/verification/index",
+      "title": "订单核销"
+    },
+    {
+      "path": "sub-pages/supply/index",
+      "title": "我要供货"
+    },
+    {
+      "path": "sub-pages/supply/goods-search",
+      "title": "商品搜索"
+    },
+    {
+      "path": "sub-pages/supply/supplier-goods-upload",
+      "title": "上传供应商商品"
+    },
+    {
+      "path": "sub-pages/supply/supplier-goods-reapply",
+      "title": "申请上架"
+    },
+    {
+      "path": "sub-pages/supply/goods",
+      "title": "供货商品"
+    },
+    {
+      "path": "sub-pages/supply/goods-reapply-upload",
+      "title": "申请上架"
+    },
+    {
+      "path": "sub-pages/supply/delivery-list",
+      "title": "待送货列表"
+    },
+    {
+      "path": "sub-pages/supply/supplier-order",
+      "title": "送货单"
+    },
+    {
+      "path": "sub-pages/supply/supplier-order-detail",
+      "title": "送货单详情"
+    },
+    {
+      "path": "sub-pages/supply/supplier-order-print-label",
+      "title": "打印标签"
+    },
+    {
+      "path": "sub-pages/supply/no-delivery",
+      "title": "暂不送货列表"
+    },
+    {
+      "path": "sub-pages/after-sale/less-goods",
+      "title": "少货单"
+    },
+    {
+      "path": "sub-pages/after-sale/excess-goods",
+      "title": "多货单"
+    },
+    {
+      "path": "sub-pages/after-sale/damage-report",
+      "title": "售后单"
+    },
+    {
+      "path": "sub-pages/after-sale/damage-report-supplier-audit",
+      "title": "供应商审核详情"
+    },
+    {
+      "path": "sub-pages/after-sale/diff-refund",
+      "title": "差额退款"
+    },
+    {
+      "path": "sub-pages/after-sale/settlement-order",
+      "title": "结算单"
+    },
+    {
+      "path": "sub-pages/warehouse/city-warehouse-inbound",
+      "title": "城市仓入库"
+    },
+    {
+      "path": "sub-pages/warehouse/transfer-order",
+      "title": "调拨单"
+    },
+    {
+      "path": "sub-pages/warehouse/transfer-order-detail",
+      "title": "调拨单详情"
+    },
+    {
+      "path": "sub-pages/warehouse/picking-order",
+      "title": "拣货单"
+    },
+    {
+      "path": "sub-pages/warehouse/picking-order-detail",
+      "title": "拣货明细"
+    },
+    {
+      "path": "sub-pages/warehouse/store-order-list",
+      "title": "订单列表"
+    },
+    {
+      "path": "sub-pages/warehouse/store-order-detail",
+      "title": "订单详情"
+    },
+    {
+      "path": "sub-pages/warehouse/inventory",
+      "title": "库存"
+    },
+    {
+      "path": "sub-pages/product/product1",
+      "title": "商品管理"
+    },
+    {
+      "path": "sub-pages/printer/connect/index",
+      "title": "蓝牙连接"
+    },
+    {
+      "path": "sub-pages/printer/test/index",
+      "title": "打印机测试"
+    }
+  ],
+  "preloadRule": {
+    "pages/login/index": {
+      "network": "all",
+      "packages": [
+        "sub-pages/auth",
+        "sub-pages/merchant"
+      ]
+    },
+    "sub-pages/auth/merchant": {
+      "network": "all",
+      "packages": [
+        "sub-pages/merchant",
+        "sub-pages/supply"
+      ]
+    },
+    "sub-pages/auth/login": {
+      "network": "all",
+      "packages": [
+        "sub-pages/rider"
+      ]
+    }
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "搜索蓝牙打印机需要获取位置信息（Android 系统要求）"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation"
+  ]
+}

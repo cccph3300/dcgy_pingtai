@@ -1362,12 +1362,17 @@ h3 {
 @media (max-width: 380px) {
   .edit-head,
   .edit-row {
-    grid-template-columns: 1fr 1fr 0.68fr 0.8fr 0.8fr 34px;
-    gap: 2px;
+    grid-template-columns: 84px minmax(0, 1fr) 52px;
+    column-gap: 5px;
+  }
+
+  .item-detail-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 28px;
   }
 
   .cell-input,
-  .number-cell {
+  .number-cell,
+  .product-picker-button {
     font-size: 11px;
   }
 }

@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>般果供应商真实接口 DEMO</title>
+    <style>
+      :root {
+        color: #202124;
+        background: #f2f4f7;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        min-height: 38px;
+        padding: 0 12px;
+        border: 0;
+        border-radius: 6px;
+        color: #fff;
+        background: #169b62;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        min-height: 38px;
+        padding: 8px 10px;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        background: #fff;
+        outline: none;
+      }
+
+      textarea {
+        min-height: 78px;
+        resize: vertical;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: #169b62;
+        box-shadow: 0 0 0 3px rgba(22, 155, 98, 0.13);
+      }
+
+      label {
+        display: grid;
+        gap: 5px;
+        color: #667085;
+        font-size: 13px;
+      }
+
+      code {
+        padding: 2px 5px;
+        border-radius: 4px;
+        background: #eef2f6;
+        color: #202124;
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
+        gap: 16px;
+        width: min(1220px, calc(100% - 28px));
+        margin: 0 auto;
+        padding: 16px 0 28px;
+      }
+
+      .phone {
+        overflow: hidden;
+        min-height: calc(100vh - 32px);
+        border: 1px solid #d8dee4;
+        border-radius: 24px;
+        background: #f7f8fa;
+        box-shadow: 0 22px 60px rgba(15, 23, 42, 0.13);
+      }
+
+      .statusbar,
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fff;
+      }
+
+      .statusbar {
+        height: 32px;
+        padding: 0 20px;
+        color: #667085;
+        font-size: 12px;
+      }
+
+      .nav {
+        height: 48px;
+        justify-content: center;
+        border-bottom: 1px solid #edf0f3;
+        font-size: 17px;
+        font-weight: 800;
+      }
+
+      .screen {
+        height: calc(100vh - 112px);
+        min-height: 620px;
+        overflow: auto;
+        padding: 12px;
+      }
+
+      .tabs {
+        position: sticky;
+        top: 0;
+        z-index: 4;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding: 8px;
+        border-radius: 8px;
+        background: rgba(247, 248, 250, 0.95);
+        backdrop-filter: blur(8px);
+      }
+
+      .tab {
+        color: #475467;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        font-size: 13px;
+      }
+
+      .tab.active {
+        color: #fff;
+        border-color: #169b62;
+        background: #169b62;
+      }
+
+      .card,
+      .panel {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .card {
+        margin-top: 10px;
+        padding: 12px;
+      }
+
+      .panel {
+        padding: 14px;
+      }
+
+      .side {
+        display: grid;
+        align-content: start;
+        gap: 12px;
+      }
+
+      .panel h1,
+      .panel h2,
+      .card h3,
+      p {
+        margin: 0;
+      }
+
+      .panel h1 {
+        font-size: 24px;
+      }
+
+      .panel h2 {
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+
+      .muted {
+        color: #667085;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .hero {
+        color: #fff;
+        border: 0;
+        background: linear-gradient(135deg, #169b62, #2563eb);
+      }
+
+      .hero .muted {
+        color: rgba(255, 255, 255, 0.78);
+      }
+
+      .hero strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 24px;
+      }
+
+      .grid2,
+      .grid3 {
+        display: grid;
+        gap: 10px;
+      }
+
+      .grid2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .ghost {
+        color: #16794c;
+        border: 1px solid #bbefd7;
+        background: #edfff6;
+      }
+
+      .danger {
+        color: #b42318;
+        border: 1px solid #ffd0c9;
+        background: #fff3f0;
+      }
+
+      .metric {
+        min-height: 72px;
+        padding: 10px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 6px;
+        font-size: 20px;
+      }
+
+      .order-head {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+      }
+
+      .order-no {
+        margin-top: 4px;
+        color: #16794c;
+        font-size: 12px;
+        word-break: break-all;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 24px;
+        padding: 0 8px;
+        border-radius: 999px;
+        color: #0b6bcb;
+        background: #e8f2ff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .pill.ok {
+        color: #067647;
+        background: #dcfae6;
+      }
+
+      .pill.warn {
+        color: #b54708;
+        background: #fff4d6;
+      }
+
+      .pill.off {
+        color: #667085;
+        background: #f2f4f7;
+      }
+
+      .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .meta {
+        padding: 8px;
+        border-radius: 6px;
+        background: #f6f8fa;
+        color: #667085;
+        font-size: 12px;
+      }
+
+      .meta strong {
+        display: block;
+        margin-top: 2px;
+        color: #202124;
+        word-break: break-word;
+      }
+
+      .goods-list {
+        display: grid;
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .goods-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 6px;
+        background: #f8fafc;
+        font-size: 12px;
+      }
+
+      .empty {
+        padding: 42px 10px;
+        text-align: center;
+      }
+
+      .error,
+      .okmsg {
+        display: none;
+        padding: 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .error {
+        color: #b42318;
+        border: 1px solid #ffd0c9;
+        background: #fff3f0;
+      }
+
+      .okmsg {
+        color: #067647;
+        border: 1px solid #a6f4c5;
+        background: #ecfdf3;
+      }
+
+      .source-list {
+        display: grid;
+        gap: 7px;
+        color: #667085;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      @media (max-width: 880px) {
+        .shell {
+          display: block;
+          width: min(430px, calc(100% - 20px));
+        }
+
+        .side {
+          margin-top: 12px;
+        }
+      }
+
+      @media (max-width: 430px) {
+        .shell {
+          width: 100%;
+          padding: 0;
+        }
+
+        .phone {
+          border-inline: 0;
+          border-radius: 0;
+        }
+
+        .grid2,
+        .grid3,
+        .meta-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="phone">
+        <div class="statusbar"><span>9:41</span><span>般果供应商</span><span>100%</span></div>
+        <div class="nav" id="pageTitle">真实接口</div>
+        <div class="screen">
+          <nav class="tabs">
+            <button class="tab active" data-view="auth" type="button">登录</button>
+            <button class="tab" data-view="list" type="button">送货单</button>
+            <button class="tab" data-view="detail" type="button">详情</button>
+          </nav>
+          <div id="content"></div>
+        </div>
+      </section>
+
+      <aside class="side">
+        <section class="panel">
+          <h1>般果供应商 DEMO</h1>
+          <p class="muted">AppID：<code>wxdfad8c82da70105d</code>；接口根地址：<code>https://banguo-gateway.banguo.xianlink.cn</code></p>
+        </section>
+
+        <section class="panel">
+          <h2>授权方式</h2>
+          <div class="source-list">
+            <div>此网页不能生成微信小程序登录凭证，也不能通过手机号直接登录般果。</div>
+            <div>仅可使用般果授权方提供的 <code>access_token</code> 或其完整登录响应导入后查询。</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>导入授权并查询</h2>
+          <div class="grid2">
+            <label>
+              授权结果或 access_token
+              <textarea id="token" autocomplete="off" placeholder="粘贴登录响应 JSON（data.loginVo.access_token）或纯 access_token"></textarea>
+            </label>
+            <label>
+              regionWhId
+              <input id="regionWhId" placeholder="可自动从仓库列表取第一项，也可手填" />
+            </label>
+          </div>
+          <div class="actions">
+            <button id="importButton" type="button">导入并查询送货单</button>
+            <button id="contextButton" type="button">初始化上下文</button>
+            <button id="listButton" type="button">查询送货单</button>
+            <button id="clearButton" class="ghost" type="button">清空本地 token</button>
+          </div>
+          <p class="muted" style="margin-top:8px">导入成功后 token 仅保存在此浏览器本机并自动复用。般果小程序未使用 refresh_token，失效后需要从真实小程序重新导入。</p>
+        </section>
+
+        <section class="panel">
+          <h2>查询条件</h2>
+          <div class="grid2">
+            <label>
+              送货单号
+              <input id="deliveryNo" placeholder="deliveryNo，可空" />
+            </label>
+            <label>
+              销售日
+              <input id="saleDate" type="date" />
+            </label>
+            <label>
+              状态
+              <select id="status">
+                <option value="">全部</option>
+                <option value="1">待装车</option>
+                <option value="2">装车中</option>
+                <option value="3">已装车</option>
+                <option value="4">已取消</option>
+              </select>
+            </label>
+            <label>
+              类型
+              <select id="listType">
+                <option value="normal">普通送货单</option>
+                <option value="base">基采送货单</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <p id="ok" class="okmsg"></p>
+        <p id="error" class="error"></p>
+      </aside>
+    </main>
+
+    <script>
+      const state = {
+        view: 'auth',
+        auth: {},
+        context: {},
+        deliveries: [],
+        detail: null,
+        printInfo: null,
+      }
+
+      const storageKeys = {
+        token: 'bangguo_supplier_real_token',
+        regionWhId: 'bangguo_supplier_real_region_wh_id',
+      }
+
+      const $ = (selector) => document.querySelector(selector)
+      const $$ = (selector) => Array.from(document.querySelectorAll(selector))
+
+      const el = {
+        content: $('#content'),
+        pageTitle: $('#pageTitle'),
+        token: $('#token'),
+        regionWhId: $('#regionWhId'),
+        importButton: $('#importButton'),
+        contextButton: $('#contextButton'),
+        listButton: $('#listButton'),
+        clearButton: $('#clearButton'),
+        deliveryNo: $('#deliveryNo'),
+        saleDate: $('#saleDate'),
+        status: $('#status'),
+        listType: $('#listType'),
+        ok: $('#ok'),
+        error: $('#error'),
+      }
+
+      el.token.value = localStorage.getItem(storageKeys.token) || ''
+      el.regionWhId.value = localStorage.getItem(storageKeys.regionWhId) || ''
+      el.saleDate.value = new Date().toLocaleDateString('sv-SE')
+
+      $$('.tab').forEach((button) => button.addEventListener('click', () => setView(button.dataset.view)))
+      el.importButton.addEventListener('click', importAndLoad)
+      el.contextButton.addEventListener('click', loadContext)
+      el.listButton.addEventListener('click', loadDeliveries)
+      el.clearButton.addEventListener('click', clearLocalToken)
+      el.token.addEventListener('input', () => save(storageKeys.token, el.token.value.trim()))
+      el.regionWhId.addEventListener('input', () => save(storageKeys.regionWhId, el.regionWhId.value.trim()))
+
+      render()
+
+      async function api(path, body) {
+        const response = await fetch(path, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body || {}),
+        })
+        const data = await response.json()
+        if (!response.ok) throw new Error(data.detail || '请求失败')
+        return data
+      }
+
+      async function run(button, text, fn) {
+        const old = button.textContent
+        button.disabled = true
+        button.textContent = text
+        message('')
+        try {
+          await fn()
+        } catch (error) {
+          message(error.message || '请求失败', true)
+        } finally {
+          button.disabled = false
+          button.textContent = old
+        }
+      }
+
+      async function checkAuth() {
+        const code = $('#wxCode').value.trim()
+        const qrToken = $('#qrToken').value.trim()
+        const invitationCode = $('#invitationCode').value.trim()
+        const data = await api('/api/check-auth', { code, qrToken, invitationCode })
+        state.auth = data
+        if (data.token) setToken(data.token)
+        message(data.token ? '认证检查已直接返回 token' : '认证检查完成，请按 binding 结果继续登录')
+        render()
+      }
+
+      async function bindingLogin() {
+        const code = $('#bindingCode').value.trim()
+        const qrToken = $('#qrToken').value.trim()
+        const invitationCode = $('#invitationCode').value.trim()
+        const data = await api('/api/binding-login', { code, qrToken, invitationCode })
+        state.auth = data
+        if (data.token) setToken(data.token)
+        message('已完成绑定登录并写入 token')
+        render()
+      }
+
+      async function phoneLogin() {
+        const code = $('#phoneCode').value.trim()
+        const authKey = $('#authKey').value.trim() || state.auth.authKey
+        const qrToken = $('#qrToken').value.trim()
+        const invitationCode = $('#invitationCode').value.trim()
+        const data = await api('/api/phone-login', { code, authKey, qrToken, invitationCode })
+        state.auth = data
+        if (data.token) setToken(data.token)
+        message('已完成手机号授权登录并写入 token')
+        render()
+      }
+
+      async function loadContext() {
+        await run(el.contextButton, '初始化中', async () => {
+          await fetchContext()
+          message('上下文初始化完成')
+          render()
+        })
+      }
+
+      async function loadDeliveries() {
+        await run(el.listButton, '查询中', async () => {
+          const total = await fetchDeliveries()
+          message(`查询完成，共 ${total} 条`)
+        })
+      }
+
+      async function importAndLoad() {
+        await run(el.importButton, '导入并查询中', async () => {
+          const importedToken = extractAccessToken(el.token.value)
+          if (!importedToken) {
+            throw new Error('未识别到 access_token，请粘贴完整登录响应 JSON 或纯 access_token')
+          }
+          setToken(importedToken)
+          await fetchContext()
+          const total = await fetchDeliveries()
+          message(`授权已导入，已查询到 ${total} 条送货单`)
+        })
+      }
+
+      async function fetchContext() {
+        const data = await api('/api/context', { token: token(), regionWhId: el.regionWhId.value.trim() })
+        state.context = data
+        if (data.regionWhId) {
+          el.regionWhId.value = String(data.regionWhId)
+          save(storageKeys.regionWhId, el.regionWhId.value)
+        }
+        return data
+      }
+
+      async function fetchDeliveries() {
+        const status = el.status.value ? [Number(el.status.value)] : []
+        const body = {
+          token: token(),
+          regionWhId: el.regionWhId.value.trim(),
+          pageNum: 1,
+          pageSize: 20,
+          deliveryNo: el.deliveryNo.value.trim(),
+          saleDate: el.saleDate.value,
+          departureDate: el.saleDate.value,
+          statusList: status,
+        }
+        const path = el.listType.value === 'base' ? '/api/delivery/base-list' : '/api/delivery/list'
+        const data = await api(path, body)
+        state.deliveries = data.rows || []
+        state.view = 'list'
+        activateTab()
+        render()
+        return data.total || state.deliveries.length
+      }
+
+      async function openDetail(deliveryId) {
+        message('')
+        try {
+          state.detail = await api('/api/delivery/info', { token: token(), deliveryId })
+          state.printInfo = null
+          state.view = 'detail'
+          activateTab()
+          render()
+        } catch (error) {
+          message(error.message || '获取详情失败', true)
+        }
+      }
+
+      async function loadPrintInfo(deliveryId) {
+        message('')
+        try {
+          state.printInfo = await api('/api/delivery/print-info', { token: token(), deliveryIdList: [Number(deliveryId)] })
+          render()
+          message('标签数据已获取')
+        } catch (error) {
+          message(error.message || '获取标签数据失败', true)
+        }
+      }
+
+      function setView(view) {
+        state.view = view
+        activateTab()
+        render()
+      }
+
+      function activateTab() {
+        $$('.tab').forEach((button) => button.classList.toggle('active', button.dataset.view === state.view))
+      }
+
+      function render() {
+        el.pageTitle.textContent = { auth: '登录', list: '送货单', detail: '详情' }[state.view] || '真实接口'
+        if (state.view === 'auth') renderAuth()
+        if (state.view === 'list') renderList()
+        if (state.view === 'detail') renderDetail()
+      }
+
+      function renderAuth() {
+        const supplier = state.context.currentSupplier || {}
+        const warehouses = state.context.warehouseList || []
+        el.content.innerHTML = `
+          <article class="card hero">
+            <p class="muted">当前 token</p>
+            <strong>${token() ? '已填写' : '未填写'}</strong>
+            <p class="muted">供应商：${escapeHtml(pick(supplier, ['supplierName', 'name']) || '-')}</p>
+          </article>
+          <article class="card">
+            <h3>导入后自动查询</h3>
+            <p class="muted">在右侧粘贴经般果授权方提供的 token 或完整登录响应，再点击“导入并查询送货单”。</p>
+          </article>
+          <article class="card">
+            <h3>上下文</h3>
+            <div class="grid3" style="margin-top:8px">
+              ${metric('供应商数', (state.context.supplierList || []).length)}
+              ${metric('仓库数', warehouses.length)}
+              ${metric('regionWhId', state.context.regionWhId || '-')}
+            </div>
+          </article>
+        `
+      }
+
+      function renderList() {
+        el.content.innerHTML = `
+          <article class="card hero">
+            <p class="muted">送货单查询</p>
+            <strong>${state.deliveries.length}</strong>
+            <p class="muted">regionWhId：${escapeHtml(el.regionWhId.value || '-')}</p>
+          </article>
+          ${state.deliveries.map(renderDelivery).join('') || empty('暂无送货单，请先初始化上下文并查询')}
+        `
+        el.content.querySelectorAll('[data-detail]').forEach((button) => {
+          button.addEventListener('click', () => openDetail(button.dataset.detail))
+        })
+        el.content.querySelectorAll('[data-print]').forEach((button) => {
+          button.addEventListener('click', () => loadPrintInfo(button.dataset.print))
+        })
+      }
+
+      function renderDetail() {
+        const detail = state.detail && state.detail.data
+        const printData = state.printInfo && state.printInfo.data
+        el.content.innerHTML = `
+          ${detail ? renderRawCard('送货单详情', detail) : empty('请先从送货单列表打开详情')}
+          ${printData ? renderRawCard('标签打印数据', printData) : ''}
+        `
+      }
+
+      function renderDelivery(item) {
+        return `
+          <article class="card">
+            <div class="order-head">
+              <div>
+                <h3>${escapeHtml(item.supplierName || item.regionWhName || '送货单')}</h3>
+                <p class="order-no">${escapeHtml(item.deliveryNo || item.id)}</p>
+              </div>
+              <span class="pill ${tone(item.status)}">${escapeHtml(item.statusText || '-')}</span>
+            </div>
+            <div class="meta-grid">
+              <div class="meta">销售日<strong>${escapeHtml(item.saleDate || '-')}</strong></div>
+              <div class="meta">仓库<strong>${escapeHtml(item.regionWhName || '-')}</strong></div>
+              <div class="meta">应送数量<strong>${escapeHtml(item.totalDeliveryQuantity || '-')}</strong></div>
+              <div class="meta">已装数量<strong>${escapeHtml(item.totalEntruckQuantity || '-')}</strong></div>
+            </div>
+            <div class="goods-list">
+              ${(item.goodsSummary || []).map((goods) => `
+                <div class="goods-line"><span>${escapeHtml(goods.goodsName || '-')}</span><strong>${escapeHtml(goods.actualQuantity || '-')}</strong></div>
+              `).join('')}
+            </div>
+            <div class="actions">
+              <button class="ghost" data-detail="${escapeAttr(item.id)}" type="button">详情</button>
+              <button data-print="${escapeAttr(item.id)}" type="button">标签数据</button>
+            </div>
+          </article>
+        `
+      }
+
+      function renderRawCard(title, data) {
+        return `
+          <article class="card">
+            <h3>${escapeHtml(title)}</h3>
+            <textarea readonly style="margin-top:8px;min-height:360px">${escapeHtml(JSON.stringify(data, null, 2))}</textarea>
+          </article>
+        `
+      }
+
+      function metric(label, value) {
+        return `<div class="metric"><span class="muted">${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`
+      }
+
+      function empty(text) {
+        return `<article class="card empty"><p class="muted">${escapeHtml(text)}</p></article>`
+      }
+
+      function pick(obj, fields) {
+        for (const field of fields) {
+          const value = obj && obj[field]
+          if (value !== undefined && value !== null && String(value).trim() !== '') return String(value)
+        }
+        return ''
+      }
+
+      function tone(status) {
+        const value = Number(status)
+        if (value === 3 || value === 5) return 'ok'
+        if (value === 4) return 'off'
+        return 'warn'
+      }
+
+      function token() {
+        return el.token.value.trim()
+      }
+
+      function extractAccessToken(value) {
+        const raw = String(value || '').trim()
+        if (!raw) return ''
+        if (!raw.startsWith('{') && !raw.startsWith('[')) {
+          return raw.replace(/^Bearer\s+/i, '').trim()
+        }
+        try {
+          const parsed = JSON.parse(raw)
+          const queue = [parsed]
+          while (queue.length) {
+            const current = queue.shift()
+            if (!current || typeof current !== 'object') continue
+            for (const key of ['access_token', 'accessToken', 'token']) {
+              if (typeof current[key] === 'string' && current[key].trim()) {
+                return current[key].replace(/^Bearer\s+/i, '').trim()
+              }
+            }
+            for (const item of Object.values(current)) {
+              if (item && typeof item === 'object') queue.push(item)
+            }
+          }
+        } catch (_) {
+          return ''
+        }
+        return ''
+      }
+
+      function setToken(value) {
+        el.token.value = value || ''
+        save(storageKeys.token, el.token.value)
+      }
+
+      function clearLocalToken() {
+        setToken('')
+        state.context = {}
+        state.deliveries = []
+        state.detail = null
+        state.printInfo = null
+        message('本地 token 已清空')
+        render()
+      }
+
+      function save(key, value) {
+        if (value) localStorage.setItem(key, value)
+        else localStorage.removeItem(key)
+      }
+
+      function message(text, isError = false) {
+        el.ok.style.display = !isError && text ? 'block' : 'none'
+        el.error.style.display = isError && text ? 'block' : 'none'
+        el.ok.textContent = !isError ? text : ''
+        el.error.textContent = isError ? text : ''
+      }
+
+      function escapeHtml(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, (char) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+        })[char])
+      }
+
+      function escapeAttr(value) {
+        return escapeHtml(value).replace(/`/g, '&#96;')
+      }
+    </script>
+  </body>
+</html>

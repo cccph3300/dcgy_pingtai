@@ -25,6 +25,8 @@ body,
 #app {
   min-height: 100%;
   margin: 0;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {

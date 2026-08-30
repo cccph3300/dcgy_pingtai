@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>昱禾联仓送货单 DEMO</title>
+    <style>
+      :root {
+        color: #1f2328;
+        background: #f6f7f9;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      main {
+        width: min(1040px, calc(100% - 24px));
+        margin: 0 auto;
+        padding: 22px 0 36px;
+      }
+
+      header {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 14px;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      header p {
+        margin-top: 6px;
+        color: #667085;
+        font-size: 14px;
+      }
+
+      .panel,
+      .order {
+        border: 1px solid #e4e7ec;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+      }
+
+      .panel {
+        display: grid;
+        grid-template-columns: 1.35fr 160px 160px 160px auto;
+        align-items: end;
+        gap: 10px;
+        padding: 14px;
+      }
+
+      .login-panel {
+        grid-template-columns: 1fr 1fr 138px 124px auto;
+        margin-bottom: 12px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        color: #667085;
+        font-size: 13px;
+      }
+
+      input {
+        width: 100%;
+        min-height: 40px;
+        padding: 0 10px;
+        border: 1px solid #d0d5dd;
+        border-radius: 6px;
+        color: #1f2328;
+        font: inherit;
+        outline: none;
+      }
+
+      input:focus {
+        border-color: #1677ff;
+        box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.12);
+      }
+
+      .checkbox {
+        display: flex;
+        min-height: 40px;
+        align-items: center;
+        gap: 8px;
+        color: #1f2328;
+      }
+
+      .checkbox input {
+        width: 16px;
+        min-height: 16px;
+      }
+
+      button {
+        min-height: 40px;
+        padding: 0 16px;
+        border: 0;
+        border-radius: 6px;
+        color: #fff;
+        background: #1677ff;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      button:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+      }
+
+      .captcha-box {
+        display: grid;
+        grid-template-columns: 1fr 92px;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .captcha-box img {
+        width: 92px;
+        height: 40px;
+        border: 1px solid #d0d5dd;
+        border-radius: 6px;
+        background: #f8fafc;
+        object-fit: contain;
+        cursor: pointer;
+      }
+
+      .tips,
+      .error {
+        margin: 10px 0 0;
+        font-size: 13px;
+      }
+
+      .tips {
+        color: #667085;
+      }
+
+      .error {
+        display: none;
+        padding: 10px 12px;
+        border: 1px solid rgba(217, 45, 32, 0.2);
+        border-radius: 6px;
+        color: #b42318;
+        background: #fff1f0;
+        font-weight: 700;
+      }
+
+      .summary {
+        display: none;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 14px 0;
+      }
+
+      .summary div {
+        padding: 12px;
+        border: 1px solid #e4e7ec;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .summary span {
+        display: block;
+        color: #667085;
+        font-size: 13px;
+      }
+
+      .summary strong {
+        display: block;
+        margin-top: 4px;
+        font-size: 22px;
+      }
+
+      .orders {
+        display: grid;
+        gap: 12px;
+      }
+
+      .empty {
+        display: none;
+        padding: 36px 12px;
+        color: #667085;
+        text-align: center;
+      }
+
+      .order {
+        overflow: hidden;
+      }
+
+      .order-title {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 10px;
+        padding: 14px;
+        border-bottom: 1px solid #e4e7ec;
+      }
+
+      .order-title h2 {
+        overflow: hidden;
+        font-size: 16px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .order-title p {
+        margin-top: 4px;
+        color: #667085;
+        font-size: 12px;
+      }
+
+      .badge {
+        padding: 4px 8px;
+        border-radius: 999px;
+        color: #0958d9;
+        background: #e6f4ff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .table {
+        display: grid;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) 90px 90px 90px;
+        gap: 10px;
+        align-items: center;
+        min-height: 44px;
+        padding: 0 14px;
+        border-bottom: 1px solid #f0f2f5;
+      }
+
+      .row:last-child {
+        border-bottom: 0;
+      }
+
+      .head {
+        min-height: 38px;
+        color: #667085;
+        background: #f8fafc;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .row span:not(:first-child) {
+        text-align: center;
+      }
+
+      @media (max-width: 820px) {
+        .panel {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .panel label:first-child,
+        .checkbox,
+        button {
+          grid-column: 1 / -1;
+        }
+
+        .login-panel label:first-child {
+          grid-column: auto;
+        }
+      }
+
+      @media (max-width: 560px) {
+        header {
+          display: block;
+        }
+
+        .panel,
+        .summary {
+          grid-template-columns: 1fr;
+        }
+
+        .row {
+          grid-template-columns: minmax(0, 1fr) 56px 56px 56px;
+          gap: 6px;
+          padding: 0 10px;
+          font-size: 13px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>昱禾联仓送货单 DEMO</h1>
+          <p>账号登录自动获取 token，再读取当日送货单，展示商品名称、数量、车位号、拍子号。</p>
+        </div>
+      </header>
+
+      <section class="panel login-panel">
+        <label>
+          账号
+          <input id="username" autocomplete="username" placeholder="手机号或账号" />
+        </label>
+        <label>
+          密码
+          <input id="password" type="password" autocomplete="current-password" placeholder="登录密码" />
+        </label>
+        <label>
+          验证码
+          <div class="captcha-box">
+            <input id="captchaCode" maxlength="8" placeholder="验证码" />
+            <img id="captchaImage" alt="验证码" title="点击刷新验证码" />
+          </div>
+        </label>
+        <button id="captchaButton" type="button">刷新验证码</button>
+        <button id="loginButton" type="button">登录获取 token</button>
+      </section>
+
+      <section class="panel">
+        <label>
+          小程序 token
+          <input id="token" type="text" autocomplete="off" placeholder="填写昱禾联仓小程序 token，明文显示" />
+        </label>
+        <label>
+          日期
+          <input id="deliveryDate" type="date" />
+        </label>
+        <label>
+          供应商
+          <input id="supplierName" placeholder="可选" />
+        </label>
+        <label>
+          商品
+          <input id="productName" placeholder="可选" />
+        </label>
+        <label class="checkbox">
+          <input id="onlyPending" type="checkbox" checked />
+          只看待发货
+        </label>
+        <button id="fetchButton" type="button">获取当日送货单</button>
+      </section>
+
+      <p class="tips">账号、密码、验证码只提交到本机 DEMO 服务，再由本机请求昱禾联仓登录接口；token 会明文显示并保存在浏览器 localStorage，方便重复测试。</p>
+      <p id="error" class="error"></p>
+
+      <section id="summary" class="summary">
+        <div><span>送货单</span><strong id="orderCount">0</strong></div>
+        <div><span>商品行</span><strong id="itemCount">0</strong></div>
+        <div><span>总数量</span><strong id="quantityTotal">0</strong></div>
+      </section>
+
+      <div id="empty" class="empty">暂无当日待送货商品</div>
+      <section id="orders" class="orders"></section>
+    </main>
+
+    <script>
+      const tokenKey = 'yhlc_delivery_demo_token'
+      const usernameKey = 'yhlc_delivery_demo_username'
+      const usernameInput = document.querySelector('#username')
+      const passwordInput = document.querySelector('#password')
+      const captchaCodeInput = document.querySelector('#captchaCode')
+      const captchaImage = document.querySelector('#captchaImage')
+      const captchaButton = document.querySelector('#captchaButton')
+      const loginButton = document.querySelector('#loginButton')
+      const tokenInput = document.querySelector('#token')
+      const deliveryDateInput = document.querySelector('#deliveryDate')
+      const supplierNameInput = document.querySelector('#supplierName')
+      const productNameInput = document.querySelector('#productName')
+      const onlyPendingInput = document.querySelector('#onlyPending')
+      const fetchButton = document.querySelector('#fetchButton')
+      const errorBox = document.querySelector('#error')
+      const summary = document.querySelector('#summary')
+      const empty = document.querySelector('#empty')
+      const ordersBox = document.querySelector('#orders')
+
+      let captchaUuid = ''
+
+      usernameInput.value = localStorage.getItem(usernameKey) || ''
+      tokenInput.value = localStorage.getItem(tokenKey) || ''
+      deliveryDateInput.value = new Date().toLocaleDateString('sv-SE')
+      loadCaptcha()
+      usernameInput.addEventListener('input', () => {
+        if (usernameInput.value.trim()) localStorage.setItem(usernameKey, usernameInput.value.trim())
+        else localStorage.removeItem(usernameKey)
+      })
+      tokenInput.addEventListener('input', () => {
+        if (tokenInput.value.trim()) localStorage.setItem(tokenKey, tokenInput.value.trim())
+        else localStorage.removeItem(tokenKey)
+      })
+      captchaImage.addEventListener('click', loadCaptcha)
+      captchaButton.addEventListener('click', loadCaptcha)
+      loginButton.addEventListener('click', login)
+      fetchButton.addEventListener('click', loadDelivery)
+
+      async function loadCaptcha() {
+        captchaButton.disabled = true
+        showError('')
+        try {
+          const response = await fetch('/api/captcha')
+          const data = await response.json()
+          if (!response.ok) throw new Error(data.detail || '获取验证码失败')
+          captchaUuid = data.uuid || ''
+          captchaImage.src = `data:image/gif;base64,${data.img || ''}`
+          captchaCodeInput.value = ''
+        } catch (error) {
+          showError(error instanceof Error ? error.message : '获取验证码失败')
+        } finally {
+          captchaButton.disabled = false
+        }
+      }
+
+      async function login() {
+        if (!usernameInput.value.trim() || !passwordInput.value.trim()) {
+          showError('请先填写账号和密码')
+          return
+        }
+        if (!captchaCodeInput.value.trim() || !captchaUuid) {
+          showError('请先填写验证码')
+          return
+        }
+        loginButton.disabled = true
+        loginButton.textContent = '登录中'
+        showError('')
+        try {
+          const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: usernameInput.value.trim(),
+              password: passwordInput.value,
+              code: captchaCodeInput.value.trim(),
+              uuid: captchaUuid,
+            }),
+          })
+          const data = await response.json()
+          if (!response.ok) throw new Error(data.detail || '登录失败')
+          tokenInput.value = data.token || ''
+          localStorage.setItem(tokenKey, tokenInput.value)
+          showError('')
+        } catch (error) {
+          showError(error instanceof Error ? error.message : '登录失败')
+          await loadCaptcha()
+        } finally {
+          loginButton.disabled = false
+          loginButton.textContent = '登录获取 token'
+        }
+      }
+
+      async function loadDelivery() {
+        const token = tokenInput.value.trim()
+        if (!token) {
+          showError('请先填写昱禾联仓小程序 token')
+          return
+        }
+        fetchButton.disabled = true
+        fetchButton.textContent = '获取中'
+        showError('')
+        try {
+          const response = await fetch('/api/today', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              token,
+              delivery_date: deliveryDateInput.value,
+              supplier_name: supplierNameInput.value.trim(),
+              product_name: productNameInput.value.trim(),
+              only_pending: onlyPendingInput.checked,
+            }),
+          })
+          const data = await response.json()
+          if (!response.ok) throw new Error(data.detail || '获取失败')
+          render(data)
+        } catch (error) {
+          showError(error instanceof Error ? error.message : '获取送货单失败')
+        } finally {
+          fetchButton.disabled = false
+          fetchButton.textContent = '获取当日送货单'
+        }
+      }
+
+      function render(data) {
+        const orders = Array.isArray(data.orders) ? data.orders : []
+        const items = Array.isArray(data.items) ? data.items : []
+        document.querySelector('#orderCount').textContent = orders.length
+        document.querySelector('#itemCount').textContent = items.length
+        document.querySelector('#quantityTotal').textContent = formatQuantity(items.reduce((sum, item) => sum + Number(item.quantity || 0), 0))
+        summary.style.display = 'grid'
+        empty.style.display = orders.length ? 'none' : 'block'
+        empty.textContent = onlyPendingInput.checked ? '暂无当日待送货商品' : '暂无当日送货单商品'
+        ordersBox.innerHTML = orders.map(renderOrder).join('')
+      }
+
+      function renderOrder(order) {
+        const items = Array.isArray(order.items) ? order.items : []
+        return `
+          <article class="order">
+            <div class="order-title">
+              <div>
+                <h2>${escapeHtml(order.supplier_name || '未命名供应商')}</h2>
+                <p>${escapeHtml(order.order_no || order.order_id || '')}</p>
+              </div>
+              <span class="badge">${items.length}项</span>
+            </div>
+            <div class="table">
+              <div class="row head"><span>商品名称</span><span>数量</span><span>车位</span><span>拍子</span></div>
+              ${items.map(renderItem).join('')}
+            </div>
+          </article>
+        `
+      }
+
+      function renderItem(item) {
+        return `
+          <div class="row">
+            <span>${escapeHtml(item.product_name || '-')}</span>
+            <span>${formatQuantity(Number(item.quantity || 0))}</span>
+            <span>${escapeHtml(item.car_no || '-')}</span>
+            <span>${escapeHtml(item.pz_no || '-')}</span>
+          </div>
+        `
+      }
+
+      function formatQuantity(value) {
+        return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.?0+$/, '')
+      }
+
+      function showError(message) {
+        errorBox.textContent = message
+        errorBox.style.display = message ? 'block' : 'none'
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (char) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+        })[char])
+      }
+    </script>
+  </body>
+</html>
