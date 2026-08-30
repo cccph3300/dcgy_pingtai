@@ -447,12 +447,13 @@
             </label>
           </div>
           <div class="actions">
+            <button id="miniappButton" class="ghost" type="button">读取已登录小程序送货单</button>
             <button id="importButton" type="button">导入并查询送货单</button>
             <button id="contextButton" type="button">初始化上下文</button>
             <button id="listButton" type="button">查询送货单</button>
             <button id="clearButton" class="ghost" type="button">清空本地 token</button>
           </div>
-          <p class="muted" style="margin-top:8px">导入成功后 token 仅保存在此浏览器本机并自动复用。般果小程序未使用 refresh_token，失效后需要从真实小程序重新导入。</p>
+          <p class="muted" style="margin-top:8px">“读取已登录小程序送货单”要求微信已登录般果供应商且调试器保持打开，只读取官方页面可见内容。</p>
         </section>
 
         <section class="panel">
@@ -497,6 +498,7 @@
         auth: {},
         context: {},
         deliveries: [],
+        miniappSnapshot: null,
         detail: null,
         printInfo: null,
       }
@@ -514,6 +516,7 @@
         pageTitle: $('#pageTitle'),
         token: $('#token'),
         regionWhId: $('#regionWhId'),
+        miniappButton: $('#miniappButton'),
         importButton: $('#importButton'),
         contextButton: $('#contextButton'),
         listButton: $('#listButton'),
@@ -531,6 +534,7 @@
       el.saleDate.value = new Date().toLocaleDateString('sv-SE')
 
       $$('.tab').forEach((button) => button.addEventListener('click', () => setView(button.dataset.view)))
+      el.miniappButton.addEventListener('click', loadMiniappDeliveries)
       el.importButton.addEventListener('click', importAndLoad)
       el.contextButton.addEventListener('click', loadContext)
       el.listButton.addEventListener('click', loadDeliveries)
@@ -625,6 +629,17 @@
           await fetchContext()
           const total = await fetchDeliveries()
           message(`授权已导入，已查询到 ${total} 条送货单`)
+        })
+      }
+
+      async function loadMiniappDeliveries() {
+        await run(el.miniappButton, '读取中', async () => {
+          const data = await api('/api/miniapp/delivery/snapshot')
+          state.miniappSnapshot = data
+          state.view = 'list'
+          activateTab()
+          render()
+          message(data.empty ? '已读取官方送货单页面，当前条件下暂无数据' : '已读取官方送货单页面内容')
         })
       }
 
@@ -726,6 +741,7 @@
 
       function renderList() {
         el.content.innerHTML = `
+          ${state.miniappSnapshot ? renderMiniappSnapshot(state.miniappSnapshot) : ''}
           <article class="card hero">
             <p class="muted">送货单查询</p>
             <strong>${state.deliveries.length}</strong>
@@ -739,6 +755,15 @@
         el.content.querySelectorAll('[data-print]').forEach((button) => {
           button.addEventListener('click', () => loadPrintInfo(button.dataset.print))
         })
+      }
+
+      function renderMiniappSnapshot(snapshot) {
+        return `
+          <article class="card">
+            <h3>已登录小程序送货单</h3>
+            <textarea readonly style="margin-top:8px;min-height:220px">${escapeHtml(snapshot.pageText || '未读取到页面内容')}</textarea>
+          </article>
+        `
       }
 
       function renderDetail() {

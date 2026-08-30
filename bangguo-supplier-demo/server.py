@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Callable
@@ -9,12 +10,15 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlparse
 from urllib.request import Request, urlopen
 
+import websocket
+
 
 BASE_URL = "https://banguo-gateway.banguo.xianlink.cn"
 CLIENT_ID = "u1zazpc5jartv40ufucgteoquttqziu3"
 APP_ID = "wxdfad8c82da70105d"
 ROOT = Path(__file__).resolve().parent
 ALLOW_MUTATIONS = False
+MINIAPP_DEBUGGER_URL = "ws://127.0.0.1:62000"
 
 
 def clean_params(params: dict[str, Any] | None) -> dict[str, Any]:
@@ -189,6 +193,90 @@ def token_from(payload: dict[str, Any]) -> str:
     return token
 
 
+def cdp_evaluate(expression: str) -> Any:
+    """在用户主动打开的微信小程序调试会话中执行无凭证读取。"""
+    try:
+        client = websocket.create_connection(MINIAPP_DEBUGGER_URL, timeout=5)
+    except Exception as error:
+        raise RuntimeError("未连接到微信小程序调试会话，请先打开般果供应商并启用调试器") from error
+
+    request_id = 1
+    try:
+        client.send(
+            json.dumps(
+                {
+                    "id": request_id,
+                    "method": "Runtime.evaluate",
+                    "params": {"expression": expression, "returnByValue": True},
+                }
+            )
+        )
+        deadline = time.monotonic() + 5
+        while time.monotonic() < deadline:
+            message = json.loads(client.recv())
+            if message.get("id") != request_id:
+                continue
+            if message.get("error"):
+                raise RuntimeError("微信小程序调试器执行失败")
+            result = message.get("result", {}).get("result", {})
+            if result.get("subtype") == "error" or result.get("exceptionDetails"):
+                raise RuntimeError("微信小程序页面读取失败")
+            return result.get("value")
+    except websocket.WebSocketTimeoutException as error:
+        raise RuntimeError("微信小程序调试会话超时") from error
+    finally:
+        client.close()
+    raise RuntimeError("微信小程序调试会话未返回结果")
+
+
+MINIAPP_DELIVERY_SNAPSHOT = r"""
+(function () {
+  var frames = Array.prototype.slice.call(document.querySelectorAll('iframe.page_frame'));
+  var deliveryFrame = frames.find(function (frame) {
+    return frame.contentDocument && frame.contentDocument.body &&
+      frame.contentDocument.body.innerText.includes('请输入送货单号');
+  });
+  if (!deliveryFrame) {
+    var workFrame = frames.find(function (frame) {
+      return frame.contentDocument && frame.contentDocument.body &&
+        frame.contentDocument.body.innerText.includes('商品·送货');
+    });
+    if (!workFrame || !workFrame.contentWindow.wx) {
+      return JSON.stringify({ ready: false, message: '未找到般果供应商作业页面' });
+    }
+    workFrame.contentWindow.wx.navigateTo({ url: '/package-supplyGoods/delivery/list' });
+    return JSON.stringify({ ready: false, message: '正在打开送货单页面' });
+  }
+  var text = deliveryFrame.contentDocument.body.innerText.trim();
+  return JSON.stringify({
+    ready: true,
+    empty: text.includes('暂无数据'),
+    pageText: text.slice(0, 30000)
+  });
+})()
+"""
+
+
+def miniapp_delivery_snapshot(_: dict[str, Any]) -> dict[str, Any]:
+    """读取当前已登录小程序送货单页面的可见内容，不读取会话或请求头。"""
+    deadline = time.monotonic() + 12
+    last_message = ""
+    while time.monotonic() < deadline:
+        raw = cdp_evaluate(MINIAPP_DELIVERY_SNAPSHOT)
+        if not isinstance(raw, str):
+            raise RuntimeError("微信小程序调试器返回格式异常")
+        payload = json.loads(raw)
+        if payload.get("ready"):
+            return {
+                "source": "wechat-miniapp-visible-page",
+                "empty": bool(payload.get("empty")),
+                "pageText": str(payload.get("pageText") or ""),
+            }
+        last_message = str(payload.get("message") or "")
+        time.sleep(0.4)
+    raise RuntimeError(last_message or "送货单页面打开超时")
+
+
 def get_context(payload: dict[str, Any]) -> dict[str, Any]:
     token = token_from(payload)
     result: dict[str, Any] = {"appId": APP_ID, "baseUrl": BASE_URL, "clientid": CLIENT_ID}
@@ -350,6 +438,7 @@ class DemoHandler(BaseHTTPRequestHandler):
             "/api/binding-login": binding_login,
             "/api/phone-login": phone_login,
             "/api/qr-scanned": qr_scanned,
+            "/api/miniapp/delivery/snapshot": miniapp_delivery_snapshot,
             "/api/context": get_context,
             "/api/delivery/list": lambda body: delivery_list(body, base=False),
             "/api/delivery/base-list": lambda body: delivery_list(body, base=True),
