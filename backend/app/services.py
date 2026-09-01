@@ -7,6 +7,7 @@ from sqlalchemy import and_, delete, func, select
 from sqlalchemy.orm import Session, joinedload
 
 from app.models import (
+    DailyPriceOverride,
     Order,
     OrderAdjustment,
     OrderItem,
@@ -16,7 +17,7 @@ from app.models import (
     User,
     Withdrawal,
 )
-from app.schemas import AdjustmentIn, OrderSaveIn, ProductIn
+from app.schemas import AdjustmentIn, DailyPriceOverrideIn, OrderSaveIn, ProductIn
 
 
 CENT = Decimal("0.01")
@@ -28,6 +29,13 @@ def money(value: Decimal) -> Decimal:
 
 def calculate_unit_profit(sale_price: Decimal, cost: Decimal, commission_price: Decimal) -> Decimal:
     return money(sale_price - cost - commission_price)
+
+
+def get_daily_price_override_map(db: Session, user: User, target_date: date) -> dict[tuple[int, str], Decimal]:
+    rows = db.scalars(
+        select(DailyPriceOverride).where(DailyPriceOverride.user_id == user.id, DailyPriceOverride.override_date == target_date)
+    ).all()
+    return {(row.product_id, row.supermarket): row.sale_price for row in rows}
 
 
 def apply_adjustments(product_amount: Decimal, adjustments: list[OrderAdjustment]) -> Decimal:
@@ -119,6 +127,57 @@ def upsert_product(db: Session, user: User, payload: ProductIn, product: Product
     return product
 
 
+def list_daily_price_overrides(db: Session, user: User, target_date: date) -> list[DailyPriceOverride]:
+    return list(
+        db.scalars(
+            select(DailyPriceOverride)
+            .where(DailyPriceOverride.user_id == user.id, DailyPriceOverride.override_date == target_date)
+            .order_by(DailyPriceOverride.created_at.desc())
+        )
+        .all()
+    )
+
+
+def upsert_daily_price_override(db: Session, user: User, payload: DailyPriceOverrideIn) -> DailyPriceOverride:
+    product = db.execute(
+        select(Product)
+        .options(joinedload(Product.supermarkets))
+        .where(Product.id == payload.product_id, Product.user_id == user.id, Product.status == "active")
+    ).unique().scalar_one_or_none()
+    if product is None:
+        raise HTTPException(status_code=404, detail="商品不存在")
+    market = next((item for item in product.supermarkets if item.supermarket == payload.supermarket and item.enabled), None)
+    if market is None:
+        raise HTTPException(status_code=400, detail=f"商品未上架当前超市：{product.name}")
+    if payload.sale_price >= market.sale_price:
+        raise HTTPException(status_code=400, detail="降价后价格必须低于原价")
+    override = db.scalar(
+        select(DailyPriceOverride).where(
+            DailyPriceOverride.user_id == user.id,
+            DailyPriceOverride.product_id == payload.product_id,
+            DailyPriceOverride.supermarket == payload.supermarket,
+            DailyPriceOverride.override_date == payload.override_date,
+        )
+    )
+    if override is None:
+        override = DailyPriceOverride(
+            user_id=user.id,
+            product_id=payload.product_id,
+            supermarket=payload.supermarket,
+            override_date=payload.override_date,
+        )
+        db.add(override)
+    override.sale_price = money(payload.sale_price)
+    return override
+
+
+def delete_daily_price_override(db: Session, user: User, override_id: int) -> None:
+    override = db.scalar(select(DailyPriceOverride).where(DailyPriceOverride.id == override_id, DailyPriceOverride.user_id == user.id))
+    if override is None:
+        raise HTTPException(status_code=404, detail="今日降价记录不存在")
+    db.delete(override)
+
+
 def save_order(db: Session, user: User, payload: OrderSaveIn) -> Order:
     order = db.execute(
         select(Order)
@@ -137,6 +196,7 @@ def save_order(db: Session, user: User, payload: OrderSaveIn) -> Order:
         db.execute(delete(OrderVehicle).where(OrderVehicle.order_id == order.id))
         db.flush()
         order.vehicles = []
+    daily_price_overrides = get_daily_price_override_map(db, user, payload.order_date)
 
     for vehicle_payload in payload.vehicles:
         vehicle = OrderVehicle(order_id=order.id, vehicle_no=vehicle_payload.vehicle_no, period=vehicle_payload.period)
@@ -145,8 +205,9 @@ def save_order(db: Session, user: User, payload: OrderSaveIn) -> Order:
         for item_payload in vehicle_payload.items:
             product, market = get_orderable_product(db, user, item_payload.product_id, payload.supermarket)
             quantity = money(item_payload.quantity)
-            unit_profit = calculate_unit_profit(market.sale_price, product.cost, market.commission_price)
-            total_amount = money(quantity * market.sale_price)
+            sale_price = daily_price_overrides.get((product.id, market.supermarket), market.sale_price)
+            unit_profit = calculate_unit_profit(sale_price, product.cost, market.commission_price)
+            total_amount = money(quantity * sale_price)
             total_profit = money(quantity * unit_profit)
             db.add(
                 OrderItem(
@@ -154,7 +215,7 @@ def save_order(db: Session, user: User, payload: OrderSaveIn) -> Order:
                     product_id=product.id,
                     product_name_snapshot=product.name,
                     quantity=quantity,
-                    unit_price=market.sale_price,
+                    unit_price=sale_price,
                     commission_price=market.commission_price,
                     cost_snapshot=product.cost,
                     unit_profit=unit_profit,

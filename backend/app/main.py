@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.config import get_settings
 from app.database import Base, engine
 from app.models import Order, OrderVehicle, User
-from app.routers import auth, orders, products, statistics, withdrawals, yhlc_delivery
+from app.routers import auth, daily_prices, orders, products, statistics, withdrawals, yhlc_delivery
 from app.security import get_password_hash
 from app.services import recalculate_order_totals
 
@@ -80,6 +80,7 @@ def root() -> dict[str, str]:
 
 app.include_router(auth.router, prefix=settings.api_prefix)
 app.include_router(products.router, prefix=settings.api_prefix)
+app.include_router(daily_prices.router, prefix=settings.api_prefix)
 app.include_router(orders.router, prefix=settings.api_prefix)
 app.include_router(statistics.router, prefix=settings.api_prefix)
 app.include_router(withdrawals.router, prefix=settings.api_prefix)

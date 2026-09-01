@@ -62,6 +62,21 @@ class ProductSupermarket(TimestampMixin, Base):
     product: Mapped["Product"] = relationship(back_populates="supermarkets")
 
 
+class DailyPriceOverride(TimestampMixin, Base):
+    __tablename__ = "daily_price_overrides"
+    __table_args__ = (UniqueConstraint("user_id", "product_id", "supermarket", "override_date", name="uq_daily_price_override"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id", ondelete="CASCADE"), index=True)
+    supermarket: Mapped[str] = mapped_column(String(32), index=True)
+    override_date: Mapped[date] = mapped_column(Date, index=True)
+    sale_price: Mapped[Decimal] = mapped_column(Money)
+
+    user: Mapped["User"] = relationship()
+    product: Mapped["Product"] = relationship()
+
+
 class Order(TimestampMixin, Base):
     __tablename__ = "orders"
     __table_args__ = (UniqueConstraint("user_id", "order_date", "supermarket", name="uq_order_user_date_market"),)

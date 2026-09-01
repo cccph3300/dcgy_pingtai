@@ -157,6 +157,39 @@ def test_product_soft_delete_keeps_order_snapshot(client: TestClient):
     assert detail["vehicles"][0]["items"][0]["product_name_snapshot"] == "苹果"
 
 
+def test_daily_price_override_affects_same_day_orders(client: TestClient):
+    headers = auth_headers(client)
+    product_id = create_product(client, headers)
+    override = client.post(
+        "/api/daily-price-overrides",
+        headers=headers,
+        json={
+            "override_date": "2026-08-16",
+            "product_id": product_id,
+            "supermarket": "supermarket_1",
+            "sale_price": "4.80",
+        },
+    )
+    assert override.status_code == 200, override.text
+    assert override.json()["sale_price"] == "4.80"
+
+    listed = client.get("/api/daily-price-overrides?date=2026-08-16", headers=headers)
+    assert listed.status_code == 200
+    assert listed.json()[0]["sale_price"] == "4.80"
+
+    order = client.post(
+        "/api/orders",
+        headers=headers,
+        json={
+            "order_date": "2026-08-16",
+            "supermarket": "supermarket_1",
+            "vehicles": [{"vehicle_no": "粤A12345", "period": "morning", "items": [{"product_id": product_id, "quantity": "10"}]}],
+        },
+    ).json()
+    assert order["total_amount"] == "48.00"
+    assert order["total_profit"] == "13.00"
+    assert order["vehicles"][0]["items"][0]["unit_price"] == "4.80"
+
 def test_withdrawal_requires_available_amount(client: TestClient):
     headers = auth_headers(client)
     no_money = client.post(

@@ -62,6 +62,24 @@ class ProductOut(ApiModel):
     supermarkets: list[ProductSupermarketOut] = Field(default_factory=list)
 
 
+class DailyPriceOverrideIn(ApiModel):
+    override_date: date
+    product_id: int
+    supermarket: str
+    sale_price: Decimal = Field(ge=0)
+
+    @field_validator("supermarket")
+    @classmethod
+    def validate_supermarket(cls, value: str) -> str:
+        if value not in {"supermarket_1", "supermarket_2"}:
+            raise ValueError("超市参数无效")
+        return value
+
+
+class DailyPriceOverrideOut(DailyPriceOverrideIn):
+    id: int
+
+
 class OrderItemIn(ApiModel):
     product_id: int
     quantity: Decimal = Field(gt=0)
