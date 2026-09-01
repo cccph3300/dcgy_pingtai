@@ -79,6 +79,7 @@ import type { DaySummary, OrderDetail, Supermarket } from '@/types'
 import { monthStartISO, todayISO } from '@/utils/date'
 import { marketName } from '@/utils/market'
 import { currency, money, quantity as formatQuantity, toNumber } from '@/utils/money'
+import { orderCommission, orderGrossAmount } from '@/utils/orderTotals'
 
 const startDate = ref(monthStartISO())
 const endDate = ref(todayISO())
@@ -95,8 +96,11 @@ async function load() {
   const fixedDays = withDetailCommissions(summary, detailsByDate)
   days.value = fixedDays
   detailOrders.value = detailsByDate.flat()
+  const allDetails = detailsByDate.flat()
   stats.value = {
     ...statistic,
+    total_amount: money(allDetails.reduce((sum, order) => sum + orderGrossAmount(order), 0)),
+    total_profit: money(allDetails.reduce((sum, order) => sum + toNumber(order.total_profit), 0)),
     total_commission: money(fixedDays.reduce((sum, day) => sum + toNumber(day.total_commission), 0)),
   }
 }
@@ -124,24 +128,21 @@ function withDetailCommissions(summary: DaySummary[], detailsByDate: OrderDetail
   if (!summary.length) return summary
   return summary.map((day, index) => {
     const detailOrders = detailsByDate[index]
-    const commissionByMarket = new Map(detailOrders.map((order) => [order.supermarket, orderCommission(order)]))
+    const detailByMarket = new Map(detailOrders.map((order) => [order.supermarket, order]))
     const orders = day.orders.map((order) => ({
       ...order,
-      total_commission: money(commissionByMarket.get(order.supermarket) ?? toNumber(order.total_commission)),
+      total_amount: money(detailByMarket.get(order.supermarket) ? orderGrossAmount(detailByMarket.get(order.supermarket)!) : toNumber(order.total_amount)),
+      total_profit: money(detailByMarket.get(order.supermarket) ? toNumber(detailByMarket.get(order.supermarket)!.total_profit) : toNumber(order.total_profit)),
+      total_commission: money(detailByMarket.get(order.supermarket) ? orderCommission(detailByMarket.get(order.supermarket)!) : toNumber(order.total_commission)),
     }))
     return {
       ...day,
       orders,
+      total_amount: money(orders.reduce((sum, order) => sum + toNumber(order.total_amount), 0)),
       total_commission: money(orders.reduce((sum, order) => sum + toNumber(order.total_commission), 0)),
+      total_profit: money(orders.reduce((sum, order) => sum + toNumber(order.total_profit), 0)),
     }
   })
-}
-
-function orderCommission(order: OrderDetail) {
-  return order.vehicles.reduce(
-    (sum, vehicle) => sum + vehicle.items.reduce((itemSum, item) => itemSum + toNumber(item.commission_price) * toNumber(item.quantity), 0),
-    0,
-  )
 }
 
 function incomeAmount(totalAmount: string | number, totalCommission: string | number) {

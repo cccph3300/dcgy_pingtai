@@ -41,10 +41,19 @@ def apply_adjustments(product_amount: Decimal, adjustments: list[OrderAdjustment
 
 
 def recalculate_order_totals(order: Order) -> None:
-    product_amount = sum((item.total_amount for vehicle in order.vehicles for item in vehicle.items), Decimal("0.00"))
+    product_amount = calculate_order_product_amount(order)
     product_profit = sum((item.total_profit for vehicle in order.vehicles for item in vehicle.items), Decimal("0.00"))
     order.total_amount = apply_adjustments(product_amount, order.adjustments)
     order.total_profit = apply_adjustments(product_profit, order.adjustments)
+
+
+def calculate_order_product_amount(order: Order) -> Decimal:
+    total = sum((item.unit_price * item.quantity for vehicle in order.vehicles for item in vehicle.items), Decimal("0.00"))
+    return money(total)
+
+
+def calculate_order_total_amount(order: Order) -> Decimal:
+    return apply_adjustments(calculate_order_product_amount(order), order.adjustments)
 
 
 def calculate_order_commission(order: Order) -> Decimal:
@@ -60,7 +69,7 @@ def order_out(order: Order) -> dict:
         "id": order.id,
         "order_date": order.order_date,
         "supermarket": order.supermarket,
-        "total_amount": money(order.total_amount),
+        "total_amount": calculate_order_total_amount(order),
         "total_profit": money(order.total_profit),
         "total_commission": calculate_order_commission(order),
         "status": order.status,
@@ -137,7 +146,7 @@ def save_order(db: Session, user: User, payload: OrderSaveIn) -> Order:
             product, market = get_orderable_product(db, user, item_payload.product_id, payload.supermarket)
             quantity = money(item_payload.quantity)
             unit_profit = calculate_unit_profit(market.sale_price, product.cost, market.commission_price)
-            total_amount = money(quantity * (market.sale_price - market.commission_price))
+            total_amount = money(quantity * market.sale_price)
             total_profit = money(quantity * unit_profit)
             db.add(
                 OrderItem(
@@ -208,7 +217,7 @@ def summarize_days(orders: list[Order]) -> list[dict]:
             {
                 "date": day,
                 "orders": order_summaries,
-                "total_amount": money(sum((item.total_amount for item in day_orders), Decimal("0.00"))),
+                "total_amount": money(sum((item["total_amount"] for item in order_summaries), Decimal("0.00"))),
                 "total_profit": money(sum((item.total_profit for item in day_orders), Decimal("0.00"))),
                 "total_commission": money(sum((item["total_commission"] for item in order_summaries), Decimal("0.00"))),
             }
@@ -224,13 +233,18 @@ def statistics_query(
         conditions.append(Order.order_date >= start_date)
     if end_date:
         conditions.append(Order.order_date <= end_date)
-    row = db.execute(
-        select(func.coalesce(func.sum(Order.total_amount), 0), func.coalesce(func.sum(Order.total_profit), 0)).where(
-            and_(*conditions)
+    orders = (
+        db.execute(
+            select(Order)
+            .options(joinedload(Order.vehicles).joinedload(OrderVehicle.items), joinedload(Order.adjustments))
+            .where(and_(*conditions))
         )
-    ).one()
-    total_amount = money(Decimal(row[0]))
-    total_profit = money(Decimal(row[1]))
+        .unique()
+        .scalars()
+        .all()
+    )
+    total_amount = money(sum((calculate_order_total_amount(order) for order in orders), Decimal("0.00")))
+    total_profit = money(sum((order.total_profit for order in orders), Decimal("0.00")))
     commission_row = db.execute(
         select(func.coalesce(func.sum(OrderItem.commission_price * OrderItem.quantity), 0))
         .join(OrderVehicle, OrderItem.vehicle_id == OrderVehicle.id)

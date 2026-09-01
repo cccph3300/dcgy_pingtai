@@ -31,7 +31,7 @@
         <strong>{{ marketName(order.supermarket) }}</strong>
         <span>
           <small>总金额</small>
-          <b>{{ currency(order.total_amount) }}</b>
+          <b>{{ currency(orderGrossAmount(order)) }}</b>
         </span>
         <span>
           <small>总抽佣</small>
@@ -282,6 +282,7 @@ import type { OrderDetail, OrderItemInput, OrderVehicle, Period, Product, Superm
 import { displayDateOnly, todayISO } from '@/utils/date'
 import { marketName } from '@/utils/market'
 import { currency, money, quantity as formatQuantity, toNumber } from '@/utils/money'
+import { orderCommission, orderGrossAmount, orderIncomeAmount, orderItemSaleAmount } from '@/utils/orderTotals'
 
 const route = useRoute()
 const productStore = useProductStore()
@@ -408,7 +409,7 @@ function vehicleGroupSummary(group: { vehicles: OrderVehicle[] }) {
   const items = group.vehicles.flatMap((vehicle) => vehicle.items)
   return {
     quantity: formatQuantity(items.reduce((sum, item) => sum + toNumber(item.quantity), 0)),
-    amount: items.reduce((sum, item) => sum + toNumber(item.total_amount), 0),
+    amount: items.reduce((sum, item) => sum + orderItemSaleAmount(item), 0),
   }
 }
 
@@ -423,7 +424,7 @@ function vehicleGroupItems(group: { vehicles: OrderVehicle[] }) {
         profit: 0,
       }
       current.quantity += toNumber(item.quantity)
-      current.amount += toNumber(item.total_amount)
+      current.amount += orderItemSaleAmount(item)
       current.profit += toNumber(item.total_profit)
       map.set(item.product_name_snapshot, current)
     }
@@ -448,7 +449,7 @@ function aggregate(order: OrderDetail) {
         commission: 0,
       }
       current.quantity += toNumber(item.quantity)
-      current.amount += toNumber(item.total_amount)
+      current.amount += orderItemSaleAmount(item)
       current.profit += toNumber(item.total_profit)
       current.commission += toNumber(item.commission_price) * toNumber(item.quantity)
       map.set(item.product_name_snapshot, current)
@@ -467,28 +468,21 @@ function productTotals(order: OrderDetail) {
   const items = order.vehicles.flatMap((vehicle) => vehicle.items)
   return {
     quantity: formatQuantity(items.reduce((sum, item) => sum + toNumber(item.quantity), 0)),
-    amount: money(items.reduce((sum, item) => sum + toNumber(item.total_amount), 0)),
+    amount: money(items.reduce((sum, item) => sum + orderItemSaleAmount(item), 0)),
     profit: money(items.reduce((sum, item) => sum + toNumber(item.total_profit), 0)),
     commission: money(items.reduce((sum, item) => sum + toNumber(item.commission_price) * toNumber(item.quantity), 0)),
   }
 }
 
-function orderCommission(order: OrderDetail) {
-  return order.vehicles.reduce(
-    (sum, vehicle) => sum + vehicle.items.reduce((itemSum, item) => itemSum + toNumber(item.commission_price) * toNumber(item.quantity), 0),
-    0,
-  )
-}
-
 const grandTotal = computed(() => ({
-  amount: orders.value.reduce((sum, order) => sum + toNumber(order.total_amount), 0),
-  income: orders.value.reduce((sum, order) => sum + orderIncome(order), 0),
+  amount: orders.value.reduce((sum, order) => sum + orderGrossAmount(order), 0),
+  income: orders.value.reduce((sum, order) => sum + orderIncomeAmount(order), 0),
   profit: orders.value.reduce((sum, order) => sum + toNumber(order.total_profit), 0),
   commission: orders.value.reduce((sum, order) => sum + orderCommission(order), 0),
 }))
 
 function orderIncome(order: OrderDetail) {
-  return toNumber(order.total_amount) - orderCommission(order)
+  return orderIncomeAmount(order)
 }
 
 async function saveAdjustments(order: OrderDetail) {
@@ -678,7 +672,7 @@ function previewItem(item: OrderItemInput) {
   const quantity = toNumber(item.quantity)
   const unitProfit = toNumber(market.sale_price) - toNumber(product.cost) - toNumber(market.commission_price)
   return {
-    amount: money(quantity * (toNumber(market.sale_price) - toNumber(market.commission_price))),
+    amount: money(quantity * toNumber(market.sale_price)),
     profit: money(quantity * unitProfit),
   }
 }

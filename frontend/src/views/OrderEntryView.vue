@@ -1281,7 +1281,7 @@ function previewItem(item: OrderItemInput) {
   const quantity = toNumber(item.quantity)
   const unitProfit = toNumber(market.sale_price) - toNumber(product.cost) - toNumber(market.commission_price)
   return {
-    amount: money(quantity * (toNumber(market.sale_price) - toNumber(market.commission_price))),
+    amount: money(quantity * toNumber(market.sale_price)),
     profit: money(quantity * unitProfit),
     commission: money(quantity * toNumber(market.commission_price)),
   }
